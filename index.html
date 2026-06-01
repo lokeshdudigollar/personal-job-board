@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="JobHunt.ai"/>
+  <meta name="theme-color" content="#040d1a"/>
+  <meta name="description" content="AI-powered job search with email sync, match scoring, curated CV & cover letter generation"/>
+
+  <title>JobHunt.ai</title>
+
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="icon-192.png"/>
+  <link rel="apple-touch-icon" href="icon-512.png"/>
+
+  <style>
+    html, body, #root {
+      margin: 0; padding: 0; width: 100%; min-height: 100%;
+      background: #040d1a;
+      /* Safe area for phones with notch */
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    /* Splash screen while React loads */
+    #splash {
+      position: fixed; inset: 0; background: #040d1a;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999; transition: opacity 0.5s;
+    }
+    #splash.hide { opacity: 0; pointer-events: none; }
+    #splash-icon {
+      width: 72px; height: 72px; border-radius: 18px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; margin-bottom: 20px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    #splash h1 {
+      font-family: system-ui, sans-serif; font-size: 28px; font-weight: 800;
+      color: #e2e8f0; letter-spacing: -0.02em; margin: 0 0 8px;
+    }
+    #splash p { font-family: monospace; color: #475569; font-size: 13px; margin: 0; }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 #3b82f644; }
+      50% { transform: scale(1.05); box-shadow: 0 0 0 16px #3b82f600; }
+    }
+    /* PWA install banner */
+    #install-banner {
+      position: fixed; bottom: 16px; left: 16px; right: 16px;
+      background: #0d1f38; border: 1px solid #1e3a5f; border-radius: 12px;
+      padding: 14px 16px; display: none; align-items: center; gap: 12px;
+      z-index: 500; box-shadow: 0 8px 32px #00000088;
+    }
+    #install-banner.show { display: flex; }
+    #install-banner span { flex: 1; font-family: monospace; font-size: 12px; color: #94a3b8; }
+    #install-btn {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white; border: none; border-radius: 8px;
+      padding: 8px 16px; font-size: 13px; font-weight: 700;
+      cursor: pointer; font-family: monospace; white-space: nowrap;
+    }
+    #dismiss-btn {
+      background: transparent; border: none; color: #475569;
+      font-size: 18px; cursor: pointer; padding: 0 4px;
+    }
+    /* Offline indicator */
+    #offline-bar {
+      display: none; position: fixed; top: 0; left: 0; right: 0;
+      background: #7f1d1d; color: #fca5a5; text-align: center;
+      font-family: monospace; font-size: 12px; padding: 6px;
+      z-index: 1000;
+    }
+    #offline-bar.show { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- Offline bar -->
+<div id="offline-bar">📡 You're offline — showing cached jobs</div>
+
+<!-- Splash screen -->
+<div id="splash">
+  <div id="splash-icon">⚡</div>
+  <h1>JobHunt<span style="color:#3b82f6">.</span>ai</h1>
+  <p>Loading your job board…</p>
+</div>
+
+<!-- App root -->
+<div id="root"></div>
+
+<!-- PWA install banner -->
+<div id="install-banner">
+  <span>📲 Install JobHunt.ai for the full app experience</span>
+  <button id="install-btn">Install</button>
+  <button id="dismiss-btn">✕</button>
+</div>
+
+<!-- React + Babel (UMD builds — no bundler needed) -->
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<!-- The full app, transpiled in-browser by Babel -->
+<script type="text/babel" data-presets="react">
+// ─── Shim React hooks for UMD global ────────────────────────────────────────
+const { useState, useEffect, useCallback, useRef } = React;
+
+// hooks shimmed from global React above
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+const STORAGE_KEY       = "jobhunt_profile_v3";
+const JOBS_CACHE_KEY    = "jobhunt_jobs_v2";
+const EMAIL_JOBS_KEY    = "jobhunt_email_jobs_v1";
+const APPLIED_KEY       = "jobhunt_applied_v1";
+const EXTRA_ANSWERS_KEY = "jobhunt_answers_v1";
+
+const PLATFORMS = [
+  { id: "yc",        name: "YC Jobs",   color: "#FF6600", realApi: true,  coverLetter: false, emailSource: false },
+  { id: "linkedin",  name: "LinkedIn",  color: "#0A66C2", realApi: false, coverLetter: true,  emailSource: true,
+    senders: ["jobs-noreply@linkedin.com","jobalerts-noreply@linkedin.com"] },
+  { id: "indeed",    name: "Indeed",    color: "#2164F3", realApi: false, coverLetter: true,  emailSource: true,
+    senders: ["alert@indeed.com","indeedemail@indeed.com"] },
+  { id: "naukri",    name: "Naukri",    color: "#FF7555", realApi: false, coverLetter: true,  emailSource: true,
+    senders: ["no-reply@naukri.com","naukri@email.naukri.com"] },
+  { id: "instahyre", name: "Instahyre", color: "#7C3AED", realApi: false, coverLetter: false, emailSource: true,
+    senders: ["no-reply@instahyre.com","team@instahyre.com"] },
+  { id: "hirist",    name: "Hirist",    color: "#00B4A2", realApi: false, coverLetter: false, emailSource: true,
+    senders: ["no-reply@hirist.tech","jobs@hirist.tech"] },
+];
+
+const EMAIL_SOURCE_IDS = PLATFORMS.filter(p => p.emailSource).map(p => p.id);
+
+const DEFAULT_CV_TEMPLATE = `{name}
+{title}  |  {email}  |  {phone}  |  {location}
+
+PROFESSIONAL SUMMARY
+{summary}
+
+SKILLS
+{skills}
+
+WORK EXPERIENCE
+{experience}
+
+EDUCATION
+{education}`;
+
+const DEFAULT_COVER_LETTER_TEMPLATE = `{date}
+
+Hiring Manager
+{company}
+
+Dear Hiring Manager,
+
+I am writing to express my strong interest in the {title} position at {company}. With {years_experience} years of experience in software engineering and expertise in {top_skills}, I am confident I can make an immediate impact on your team.
+
+{why_company_paragraph}
+
+{key_achievements_paragraph}
+
+I would welcome the opportunity to discuss how my background aligns with your goals.
+
+Warm regards,
+{name}
+{email}  |  {phone}`;
+
+const BLANK_PROFILE = {
+  name:"", email:"", phone:"", location:"",
+  title:"", summary:"", skills:"",
+  experience:[{ company:"", role:"", duration:"", description:"" }],
+  education: [{ institution:"", degree:"", year:"" }],
+  cvTemplate: DEFAULT_CV_TEMPLATE,
+  coverLetterTemplate: DEFAULT_COVER_LETTER_TEMPLATE,
+  linkedin:"", github:"", portfolio:"",
+  noticePeriod:"", expectedCTC:"", currentCTC:"",
+};
+
+// ─── Storage ──────────────────────────────────────────────────────────────────
+const ls = {
+  get: (k, fb=null) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+function loadProfile() {
+  const p = ls.get(STORAGE_KEY);
+  if (!p) return BLANK_PROFILE;
+  return { ...BLANK_PROFILE, ...p,
+    coverLetterTemplate: p.coverLetterTemplate || DEFAULT_COVER_LETTER_TEMPLATE };
+}
+function loadApplied() { return new Set(ls.get(APPLIED_KEY, [])); }
+function markApplied(id) { const s = loadApplied(); s.add(id); ls.set(APPLIED_KEY, [...s]); }
+function loadExtraAnswers() { return ls.get(EXTRA_ANSWERS_KEY, {}); }
+function saveExtraAnswers(a) { ls.set(EXTRA_ANSWERS_KEY, a); }
+
+// ─── Claude helpers ───────────────────────────────────────────────────────────
+async function callClaude(prompt, maxTokens=400) {
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:maxTokens,
+      messages:[{ role:"user", content:prompt }] })
+  });
+  const d = await res.json();
+  return d.content?.find(b=>b.type==="text")?.text || "";
+}
+
+async function parseEmailJobsWithClaude(emailBodies, platformId) {
+  const platformName = PLATFORMS.find(p=>p.id===platformId)?.name || platformId;
+  const prompt = `You are a job alert email parser. Extract job listings from these ${platformName} job alert emails.
+For each job found return a JSON array. Each item must have:
+{ "title": string, "company": string, "location": string, "remote": boolean, "url": string, "description": string, "salary": string|null }
+Rules:
+- remote=true only if "remote" is explicitly mentioned
+- url must be the actual job application link (not a tracking redirect if avoidable)
+- description: 1-2 sentence summary of the role
+- If no jobs found return []
+EMAIL CONTENT:
+${emailBodies.slice(0, 6000)}
+Respond ONLY with a valid JSON array. No explanation.`;
+  try {
+    const text = await callClaude(prompt, 1500);
+    const clean = text.replace(/```json|```/g,"").trim();
+    return JSON.parse(clean);
+  } catch { return []; }
+}
+
+async function scoreJob(job, profile) {
+  if (!profile.skills && !profile.summary) return { score:0, reasons:["Complete your profile to get match scores"] };
+  const prompt = `You are a recruiter scoring a candidate-job match.
+CANDIDATE: ${profile.title}, Skills: ${profile.skills}, Summary: ${profile.summary?.slice(0,300)}
+JOB: ${job.title} at ${job.company}. ${(job.description||"").slice(0,500)}
+Respond ONLY with JSON: {"score":<0-100>,"reasons":["reason1","reason2","reason3"]}`;
+  try {
+    const text = await callClaude(prompt, 300);
+    return JSON.parse(text.replace(/```json|```/g,"").trim());
+  } catch { return { score:50, reasons:["Could not compute match"] }; }
+}
+
+async function generateCuratedCV(job, profile) {
+  const prompt = `You are a professional resume writer. Tailor this CV template for the job below using ONLY the candidate's real info. Emphasise most relevant skills and experience.
+PROFILE: ${JSON.stringify({...profile, cvTemplate:undefined, coverLetterTemplate:undefined})}
+JOB: ${job.title} at ${job.company}
+JOB DESCRIPTION: ${(job.description||"").slice(0,800)}
+CV TEMPLATE:
+${profile.cvTemplate}
+Return ONLY the final filled CV text. No preamble.`;
+  return await callClaude(prompt, 1200);
+}
+
+async function generateCoverLetter(job, profile) {
+  const today = new Date().toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"});
+  const prompt = `You are a professional cover letter writer. Write a compelling personalised cover letter using ONLY the candidate's real data.
+PROFILE: ${JSON.stringify({...profile, cvTemplate:undefined, coverLetterTemplate:undefined})}
+JOB: ${job.title} at ${job.company}
+JOB DESCRIPTION: ${(job.description||"").slice(0,800)}
+TEMPLATE:
+${profile.coverLetterTemplate}
+Fill: {date}=${today}, {years_experience}=estimate from experience, {top_skills}=3-4 most relevant, {why_company_paragraph}=2-3 specific sentences about this company/role, {key_achievements_paragraph}=2-3 achievements relevant to this job.
+Return ONLY the final cover letter text.`;
+  return await callClaude(prompt, 900);
+}
+
+async function detectMissingFields(job, profile, extraAnswers) {
+  const knownFields = {
+    name: profile.name, email: profile.email, phone: profile.phone,
+    location: profile.location, title: profile.title,
+    linkedin: profile.linkedin, github: profile.github,
+    portfolio: profile.portfolio, noticePeriod: profile.noticePeriod,
+    expectedCTC: profile.expectedCTC, currentCTC: profile.currentCTC,
+    skills: profile.skills,
+  };
+  const alreadyAnswered = Object.keys(extraAnswers || {});
+  const prompt = `You are analysing a job application form. Given this job description, what fields would a typical application form ask for that are NOT already provided?
+JOB: ${job.title} at ${job.company}
+JOB DESCRIPTION: ${(job.description||"").slice(0,600)}
+ALREADY KNOWN: ${JSON.stringify(knownFields)}
+ALREADY ANSWERED EXTRA FIELDS: ${alreadyAnswered.join(", ")||"none"}
+Return ONLY a JSON array of missing field objects: [{"field":"fieldName","question":"Human readable question to ask user","type":"text|number|select","options":["opt1","opt2"] (only for select type)}]
+Only include genuinely necessary fields not already covered. Max 6 fields. If nothing missing return [].`;
+  try {
+    const text = await callClaude(prompt, 600);
+    return JSON.parse(text.replace(/```json|```/g,"").trim());
+  } catch { return []; }
+}
+
+// ─── Gmail MCP helpers ────────────────────────────────────────────────────────
+async function fetchJobEmailsFromGmail(profile) {
+  // Build sender query across all email-source platforms
+  const allSenders = PLATFORMS.filter(p=>p.emailSource).flatMap(p=>p.senders);
+  const senderQuery = allSenders.map(s=>`from:${s}`).join(" OR ");
+  const query = `(${senderQuery}) newer_than:7d`;
+
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      model:"claude-sonnet-4-20250514", max_tokens:1000,
+      mcp_servers:[{ type:"url", url:"https://gmailmcp.googleapis.com/mcp/v1", name:"gmail-mcp" }],
+      messages:[{ role:"user", content:`Search Gmail for job alert emails using this query: "${query}". Fetch the content of up to 20 matching emails. For each email return the sender address, subject, and the full plain-text body. Format as JSON array: [{"sender":"...","subject":"...","body":"..."}]. Return ONLY the JSON array.` }]
+    })
+  });
+  const data = await res.json();
+
+  // Extract the tool result or text
+  let rawEmails = [];
+  for (const block of (data.content||[])) {
+    if (block.type === "mcp_tool_result") {
+      try { rawEmails = JSON.parse(block.content?.[0]?.text || "[]"); break; } catch {}
+    }
+    if (block.type === "text") {
+      try {
+        const clean = block.text.replace(/```json|```/g,"").trim();
+        const parsed = JSON.parse(clean);
+        if (Array.isArray(parsed)) { rawEmails = parsed; break; }
+      } catch {}
+    }
+  }
+
+  if (!rawEmails.length) return [];
+
+  // Group by platform based on sender
+  const grouped = {};
+  for (const email of rawEmails) {
+    const sender = (email.sender||"").toLowerCase();
+    const platform = PLATFORMS.find(p => p.emailSource && p.senders?.some(s => sender.includes(s.split("@")[1])));
+    if (!platform) continue;
+    if (!grouped[platform.id]) grouped[platform.id] = [];
+    grouped[platform.id].push(`SUBJECT: ${email.subject}\n${email.body}`);
+  }
+
+  // Parse jobs per platform
+  const jobs = [];
+  for (const [platformId, bodies] of Object.entries(grouped)) {
+    const parsed = await parseEmailJobsWithClaude(bodies.join("\n\n---\n\n"), platformId);
+    for (const j of parsed) {
+      const remote = j.remote || /remote/i.test(j.location||"");
+      const loc = j.location || (remote ? "Remote" : "");
+      // Skip WFO jobs not in Bengaluru
+      if (!remote && !/bengaluru|bangalore/i.test(loc)) continue;
+      jobs.push({
+        id: `email_${platformId}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
+        platform: platformId,
+        source: "email",
+        title: j.title || "Software Engineer",
+        company: j.company || "Unknown",
+        description: j.description || "",
+        salary: j.salary || null,
+        remote,
+        location: remote ? "Remote – Worldwide" : loc,
+        country: detectCountry(j.location||"", j.location||""),
+        url: j.url || platformUrl(platformId, j.title||""),
+        score: null, reasons: [], scoreLoading: false,
+        postedAt: "from email",
+      });
+    }
+  }
+  return jobs;
+}
+
+// ─── YC Jobs ──────────────────────────────────────────────────────────────────
+async function fetchYCJobs() {
+  try {
+    const userRes = await fetch("https://hacker-news.firebaseio.com/v0/user/whoishiring.json");
+    const userData = await userRes.json();
+    const submitted = userData.submitted?.slice(0,5)||[];
+    const stories = await Promise.all(submitted.map(id=>fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(r=>r.json())));
+    const thread = stories.find(s=>s.title?.includes("Who is Hiring")&&s.title?.includes("2025"));
+    if (!thread) return [];
+    const kids = (thread.kids||[]).slice(0,60);
+    const comments = await Promise.all(kids.map(id=>fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(r=>r.json()).catch(()=>null)));
+    return comments.filter(Boolean).filter(c=>c.text&&c.text.length>100).map(c=>{
+      const text = c.text.replace(/<[^>]+>/g," ").replace(/&amp;/g,"&").replace(/&#x27;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">");
+      const lines = text.split("|").map(l=>l.trim());
+      const remote = /remote/i.test(text);
+      const locMatch = text.match(/\b(Bangalore|Bengaluru|Mumbai|Delhi|Hyderabad|Chennai|Pune|San Francisco|New York|London|Berlin|Singapore|Toronto)\b/i);
+      return { id:`yc_${c.id}`, platform:"yc", source:"api",
+        title:lines[1]||"Software Engineer", company:lines[0]||"Unknown",
+        description:text.slice(0,800), remote,
+        location:remote?"Remote":(locMatch?.[1]||"Unknown"),
+        country:detectCountry(text,locMatch?.[1]),
+        url:`https://news.ycombinator.com/item?id=${c.id}`,
+        score:null, reasons:[], scoreLoading:false,
+        postedAt:new Date(c.time*1000).toLocaleDateString() };
+    });
+  } catch(e) { console.error("YC",e); return []; }
+}
+
+function detectCountry(text, location) {
+  const t = (text+location).toLowerCase();
+  if (/\busa?\b|united states|san francisco|new york|seattle|austin/i.test(t)) return "🇺🇸 USA";
+  if (/\buk\b|united kingdom|london/i.test(t)) return "🇬🇧 UK";
+  if (/\bindia\b|bangalore|bengaluru|mumbai|delhi|hyderabad/i.test(t)) return "🇮🇳 India";
+  if (/\bgermany\b|berlin|munich/i.test(t)) return "🇩🇪 Germany";
+  if (/\bcanada\b|toronto|vancouver/i.test(t)) return "🇨🇦 Canada";
+  if (/\bsingapore\b/i.test(t)) return "🇸🇬 Singapore";
+  return "🌍 Global";
+}
+
+function generateMockJobs(platform) {
+  const titles = ["Senior Software Engineer","Staff Engineer","Backend Engineer","Full Stack Engineer","Principal Engineer","Engineering Lead"];
+  const cos = { linkedin:["Flipkart","Swiggy","Zomato","Meesho","PhonePe","CRED","Razorpay","Groww"],
+    indeed:["Infosys","Wipro","TCS","HCL","Capgemini","Accenture","ThoughtWorks","Mphasis"],
+    naukri:["Paytm","PolicyBazaar","Nykaa","Dream11","Byju's","Unacademy","UpGrad","Vedantu"],
+    instahyre:["Atlassian","Freshworks","Zoho","Chargebee","Postman","BrowserStack","Hasura","Setu"],
+    hirist:["Ola","Uber India","ShareChat","InMobi","MakeMyTrip","Info Edge","Housing","Licious"] };
+  const stacks = ["Node.js, React, PostgreSQL, AWS","Java, Spring Boot, Kafka, Kubernetes",
+    "Python, Django, Redis, GCP","Go, gRPC, MongoDB, Docker","TypeScript, Next.js, Prisma, Azure"];
+  const locs = ["Bengaluru","Remote","Remote","Bengaluru","Remote","Bengaluru","Remote","Bengaluru"];
+  const platCos = cos[platform]||cos.linkedin;
+  return Array.from({length:6},(_,i)=>{
+    const loc=locs[i%locs.length]; const remote=loc==="Remote"; const tech=stacks[i%stacks.length];
+    return { id:`${platform}_mock_${i}`, platform, source:"mock",
+      title:titles[i%titles.length], company:platCos[i%platCos.length],
+      description:`We are looking for a ${titles[i%titles.length]} with 6-10 years of experience.\nTech stack: ${tech}.\nResponsibilities: Design scalable systems, lead teams, mentor engineers, code reviews.\nRequirements: Strong DSA & system design, distributed systems, ${tech}.\nBenefits: Competitive salary, ESOP, health insurance, learning budget.`,
+      remote, salary:null,
+      location:remote?"Remote – Worldwide":"Bengaluru, India",
+      country:remote?"🌍 Global":"🇮🇳 India",
+      url:platformUrl(platform,titles[i%titles.length]),
+      score:null, reasons:[], scoreLoading:false,
+      postedAt:`${Math.floor(Math.random()*7)+1}d ago` };
+  });
+}
+
+function platformUrl(platform, title) {
+  const q = encodeURIComponent((title||"senior software engineer")+" Bengaluru OR remote");
+  return { linkedin:`https://www.linkedin.com/jobs/search/?keywords=${q}&f_WT=2%2C1`,
+    indeed:`https://in.indeed.com/jobs?q=${q}`,
+    naukri:`https://www.naukri.com/senior-software-engineer-jobs-in-bangalore`,
+    instahyre:`https://www.instahyre.com/search-jobs/?q=${encodeURIComponent("senior software engineer")}`,
+    hirist:`https://www.hirist.tech/jobs/senior-software-engineer` }[platform] || "#";
+}
+
+// ─── UI atoms ─────────────────────────────────────────────────────────────────
+function ScoreBadge({score,loading}) {
+  if (loading) return <span style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:"#1e293b",color:"#94a3b8",fontFamily:"monospace"}}>scoring…</span>;
+  if (score===null) return <span style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:"#1e293b",color:"#64748b",fontFamily:"monospace"}}>–</span>;
+  const c=score>=75?"#22c55e":score>=50?"#f59e0b":"#ef4444";
+  return <span style={{fontSize:12,fontWeight:700,padding:"2px 10px",borderRadius:20,background:c+"22",color:c,border:`1px solid ${c}44`,fontFamily:"monospace"}}>{score}%</span>;
+}
+
+function SourceBadge({source}) {
+  if (source==="email") return <span style={{fontSize:9,padding:"1px 5px",borderRadius:3,background:"#065f4622",color:"#34d399",border:"1px solid #065f4644",fontWeight:700}}>📧 EMAIL</span>;
+  if (source==="api")   return <span style={{fontSize:9,padding:"1px 5px",borderRadius:3,background:"#22c55e22",color:"#22c55e",border:"1px solid #22c55e44",fontWeight:700}}>LIVE</span>;
+  return null;
+}
+
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
+export default function App() {
+  const [tab, setTab]           = useState("jobs");
+  const [profile, setProfile]   = useState(loadProfile);
+  const [jobs, setJobs]         = useState([]);
+  const [emailJobs, setEmailJobs] = useState(ls.get(EMAIL_JOBS_KEY,[]));
+  const [fetchingEmail, setFetchingEmail] = useState(false);
+  const [loading, setLoading]   = useState(false);
+  const [minScore, setMinScore] = useState(0);
+  const [selPlatforms, setSelPlatforms] = useState(PLATFORMS.map(p=>p.id));
+  const [remoteFilter, setRemoteFilter] = useState("all");
+  const [sourceFilter, setSourceFilter] = useState("all"); // all | email | board
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [applied, setApplied]   = useState(loadApplied);
+  // Apply flow state machine: null | "generating" | "review" | "missing_fields" | "applying"
+  const [applyFlow, setApplyFlow] = useState(null);
+  const [toast, setToast]       = useState(null);
+
+  function showToast(msg,type="success"){setToast({msg,type});setTimeout(()=>setToast(null),3500);}
+
+  // ── Load YC + mock jobs ───────────────────────────────────────────────────
+  const loadBoardJobs = useCallback(async () => {
+    setLoading(true);
+    let all = [];
+    if (selPlatforms.includes("yc")) all = [...all, ...await fetchYCJobs()];
+    for (const p of PLATFORMS.filter(p=>p.id!=="yc"&&!p.emailSource)) {
+      if (selPlatforms.includes(p.id)) all=[...all,...generateMockJobs(p.id)];
+    }
+    // For email-source platforms show mock only if no email jobs for that platform
+    for (const p of PLATFORMS.filter(p=>p.emailSource&&p.id!=="yc")) {
+      if (!selPlatforms.includes(p.id)) continue;
+      const hasEmail = emailJobs.some(j=>j.platform===p.id);
+      if (!hasEmail) all=[...all,...generateMockJobs(p.id)];
+    }
+    all = all.filter(j=>j.remote||/bengaluru|bangalore/i.test(j.location));
+    setJobs(all); setLoading(false);
+    scoreAllJobs(all);
+  }, [selPlatforms, emailJobs]);
+
+  // ── Fetch email jobs via Gmail MCP ────────────────────────────────────────
+  async function handleFetchEmailJobs() {
+    setFetchingEmail(true);
+    try {
+      const fetched = await fetchJobEmailsFromGmail(profile);
+      if (fetched.length===0) { showToast("No new job alerts found in last 7 days","info"); }
+      else { showToast(`Found ${fetched.length} jobs from your email alerts! 📧`); }
+      const merged = [
+        ...fetched,
+        ...emailJobs.filter(ej=>!fetched.some(fj=>fj.company===ej.company&&fj.title===ej.title))
+      ].slice(0,100);
+      setEmailJobs(merged); ls.set(EMAIL_JOBS_KEY, merged);
+      scoreAllJobs(fetched);
+    } catch(e) { showToast("Could not fetch emails — check Gmail connection","error"); }
+    setFetchingEmail(false);
+  }
+
+  async function scoreAllJobs(jobList) {
+    if (!profile.skills && !profile.summary) return;
+    const batch = jobList.slice(0,24);
+    for (let i=0;i<batch.length;i+=3) {
+      const chunk=batch.slice(i,i+3);
+      const updateLoading = (arr) => arr.map(j=>chunk.find(c=>c.id===j.id)?{...j,scoreLoading:true}:j);
+      setJobs(p=>updateLoading(p)); setEmailJobs(p=>updateLoading(p));
+      const results = await Promise.all(chunk.map(j=>scoreJob(j,profile)));
+      const applyResults = (arr) => arr.map(j=>{
+        const idx=chunk.findIndex(c=>c.id===j.id); if(idx===-1)return j;
+        return {...j,score:results[idx].score,reasons:results[idx].reasons,scoreLoading:false};
+      });
+      setJobs(p=>applyResults(p)); setEmailJobs(p=>applyResults(p));
+    }
+  }
+
+  useEffect(()=>{ loadBoardJobs(); },[]);
+
+  const allVisibleJobs = [...emailJobs, ...jobs]
+    .filter((j,i,arr)=>arr.findIndex(x=>x.id===j.id)===i) // dedup
+    .filter(j=>selPlatforms.includes(j.platform))
+    .filter(j=>j.score===null||j.score>=minScore)
+    .filter(j=>remoteFilter==="all"?true:remoteFilter==="remote"?j.remote:!j.remote)
+    .filter(j=>sourceFilter==="all"?true:sourceFilter==="email"?j.source==="email":j.source!=="email")
+    .sort((a,b)=>(b.score||0)-(a.score||0));
+
+  function handleSaveProfile(p){setProfile(p);ls.set(STORAGE_KEY,p);showToast("Profile saved!");setTab("jobs");}
+
+  // ── Full apply flow ───────────────────────────────────────────────────────
+  async function startApplyFlow(job) {
+    const hasCL = PLATFORMS.find(p=>p.id===job.platform)?.coverLetter;
+    setApplyFlow({ stage:"generating", job, cv:null, coverLetter:null, missingFields:[], extraAnswers:{}, activeDoc:"cv" });
+    const [cv, cl, missing] = await Promise.all([
+      generateCuratedCV(job, profile),
+      hasCL ? generateCoverLetter(job, profile) : Promise.resolve(null),
+      detectMissingFields(job, profile, loadExtraAnswers()),
+    ]);
+    const savedAnswers = loadExtraAnswers();
+    const stillMissing = missing.filter(f=>!savedAnswers[f.field]);
+    setApplyFlow(prev=>({...prev, stage:"review", cv, coverLetter:cl,
+      missingFields:stillMissing, extraAnswers:savedAnswers}));
+  }
+
+  function handleApproveDocuments() {
+    if (applyFlow.missingFields.length>0) {
+      setApplyFlow(prev=>({...prev, stage:"missing_fields"}));
+    } else {
+      executeApply();
+    }
+  }
+
+  function handleMissingAnswersSubmit(answers) {
+    const merged = {...loadExtraAnswers(),...answers};
+    saveExtraAnswers(merged);
+    setApplyFlow(prev=>({...prev, extraAnswers:merged, stage:"applying"}));
+    executeApply(merged);
+  }
+
+  function executeApply(extraAnswers) {
+    const {job} = applyFlow;
+    markApplied(job.id);
+    setApplied(loadApplied());
+    window.open(job.url,"_blank");
+    setApplyFlow(null);
+    showToast(`Opened ${job.company} — form ready to fill with your docs!`);
+  }
+
+  return (
+    <div style={{minHeight:"100vh",background:"#040d1a",color:"#e2e8f0",fontFamily:"'DM Mono','Fira Code',monospace"}}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+        *{box-sizing:border-box;margin:0;padding:0;}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0a1628}::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:3px}
+        .jcard{transition:all 0.2s;border:1px solid #1e293b;}
+        .jcard:hover{border-color:#334155;transform:translateY(-2px);box-shadow:0 8px 32px #00000088;}
+        .tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;}
+        .btn{cursor:pointer;border:none;font-family:inherit;transition:all 0.15s;}
+        .btn:hover{opacity:0.85;}
+        .btn:disabled{opacity:0.4;cursor:not-allowed;}
+        input,textarea,select{background:#0a1628;border:1px solid #1e293b;color:#e2e8f0;font-family:inherit;font-size:13px;padding:8px 12px;border-radius:6px;width:100%;outline:none;}
+        input:focus,textarea:focus,select:focus{border-color:#3b82f6;}
+        .pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid;transition:all 0.15s;user-select:none;}
+        .overlay{position:fixed;inset:0;background:#00000099;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
+        .modal{background:#0d1f38;border:1px solid #1e3a5f;border-radius:12px;max-width:760px;width:100%;max-height:90vh;overflow:auto;padding:28px;}
+        .dtab{padding:7px 18px;border-radius:8px 8px 0 0;font-size:12px;cursor:pointer;border:1px solid;transition:all 0.15s;font-family:inherit;}
+        .dtab.on{background:#061122;border-color:#1e3a5f;border-bottom-color:#061122;color:#e2e8f0;}
+        .dtab.off{background:transparent;border-color:transparent;color:#475569;}
+        .dtab.off:hover{color:#94a3b8;}
+        .slider{-webkit-appearance:none;height:4px;border-radius:2px;background:linear-gradient(to right,#3b82f6 0%,#3b82f6 var(--val,0%),#1e293b var(--val,0%),#1e293b 100%);}
+        .slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#3b82f6;cursor:pointer;}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .fade{animation:fadeIn 0.3s ease;}
+        .spin{animation:spin 1s linear infinite;display:inline-block;}
+        .sl{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#475569;margin-bottom:6px;}
+        .applied-badge{font-size:9px;padding:1px 6px;border-radius:3px;background:#16532d22;color:#4ade80;border:1px solid #16532d44;font-weight:700;}
+      `}</style>
+
+      {/* Header */}
+      <div style={{borderBottom:"1px solid #1e293b",padding:"0 24px"}}>
+        <div style={{maxWidth:1100,margin:"0 auto",display:"flex",alignItems:"center",gap:20,height:60}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{width:28,height:28,borderRadius:6,background:"linear-gradient(135deg,#3b82f6,#8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>⚡</div>
+            <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:18,letterSpacing:"-0.02em"}}>JobHunt<span style={{color:"#3b82f6"}}>.</span>ai</span>
+          </div>
+          {/* Email sync button */}
+          <button className="btn" onClick={handleFetchEmailJobs} disabled={fetchingEmail}
+            style={{display:"flex",alignItems:"center",gap:6,padding:"6px 14px",borderRadius:8,background:"#0a1e10",color:fetchingEmail?"#64748b":"#34d399",border:"1px solid #065f4644",fontSize:12}}>
+            {fetchingEmail?<span className="spin">⟳</span>:"📧"}
+            {fetchingEmail?"Scanning inbox…":`Sync Email Jobs${emailJobs.length?` (${emailJobs.length})`:" "}`}
+          </button>
+          <div style={{flex:1}}/>
+          {["jobs","profile"].map(t=>(
+            <button key={t} className="btn" onClick={()=>setTab(t)}
+              style={{padding:"6px 16px",borderRadius:6,fontSize:13,fontFamily:"inherit",
+                background:tab===t?"#1e3a5f":"transparent",
+                color:tab===t?"#60a5fa":"#64748b",
+                border:`1px solid ${tab===t?"#2563eb44":"transparent"}`}}>
+              {t==="jobs"?"🔍 Jobs":"👤 Profile"}
+            </button>
+          ))}
+          <div style={{width:8,height:8,borderRadius:4,background:profile.name?"#22c55e":"#ef4444"}}/>
+        </div>
+      </div>
+
+      <div style={{maxWidth:1100,margin:"0 auto",padding:"24px"}}>
+        {tab==="jobs"
+          ? <JobsTab jobs={allVisibleJobs} allJobs={[...emailJobs,...jobs]} loading={loading}
+              minScore={minScore} setMinScore={setMinScore}
+              selPlatforms={selPlatforms} setSelPlatforms={setSelPlatforms}
+              remoteFilter={remoteFilter} setRemoteFilter={setRemoteFilter}
+              sourceFilter={sourceFilter} setSourceFilter={setSourceFilter}
+              selectedJob={selectedJob} setSelectedJob={setSelectedJob}
+              onRefresh={loadBoardJobs} onApply={startApplyFlow}
+              applied={applied} profile={profile} />
+          : <ProfileTab profile={profile} onSave={handleSaveProfile} />
+        }
+      </div>
+
+      {/* Apply Flow Modal */}
+      {applyFlow && (
+        <div className="overlay" onClick={e=>e.target===e.currentTarget&&setApplyFlow(null)}>
+          <div className="modal fade">
+            {applyFlow.stage==="generating" && <GeneratingStage job={applyFlow.job}/>}
+            {applyFlow.stage==="review"     && <ReviewStage flow={applyFlow} setFlow={setApplyFlow} onApprove={handleApproveDocuments} onClose={()=>setApplyFlow(null)} showToast={showToast}/>}
+            {applyFlow.stage==="missing_fields" && <MissingFieldsStage flow={applyFlow} onSubmit={handleMissingAnswersSubmit} onBack={()=>setApplyFlow(p=>({...p,stage:"review"}))}/>}
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <div style={{position:"fixed",bottom:24,right:24,background:toast.type==="error"?"#7f1d1d":toast.type==="info"?"#1e3a5f":"#16a34a",color:"white",padding:"10px 18px",borderRadius:8,fontSize:13,fontWeight:500,zIndex:200,animation:"fadeIn 0.2s ease",maxWidth:360}}>
+          {toast.msg}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Apply Flow Stages ────────────────────────────────────────────────────────
+function GeneratingStage({job}) {
+  const [step, setStep] = useState(0);
+  const steps = ["Tailoring CV to job requirements…","Writing cover letter…","Scanning for missing form fields…"];
+  useEffect(()=>{
+    const t = setInterval(()=>setStep(p=>p<steps.length-1?p+1:p),3000);
+    return ()=>clearInterval(t);
+  },[]);
+  return (
+    <div style={{textAlign:"center",padding:"50px 20px"}}>
+      <div style={{fontSize:40,marginBottom:16}} className="spin">⟳</div>
+      <div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:18,marginBottom:8}}>Preparing your application</div>
+      <div style={{color:"#64748b",fontSize:13,marginBottom:24}}>{job.title} @ {job.company}</div>
+      <div style={{display:"flex",flexDirection:"column",gap:8,maxWidth:320,margin:"0 auto"}}>
+        {steps.map((s,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:10,fontSize:12,color:i<=step?"#60a5fa":"#334155",transition:"color 0.3s"}}>
+            <span style={{fontSize:14}}>{i<step?"✅":i===step?<span className="spin">⟳</span>:"○"}</span> {s}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ReviewStage({flow, setFlow, onApprove, onClose, showToast}) {
+  const {job, cv, coverLetter, activeDoc} = flow;
+  const hasCL = PLATFORMS.find(p=>p.id===job.platform)?.coverLetter;
+  const setDoc = (d) => setFlow(p=>({...p,activeDoc:d}));
+  const setCV = (v) => setFlow(p=>({...p,cv:v}));
+  const setCL = (v) => setFlow(p=>({...p,coverLetter:v}));
+  return (
+    <>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:18}}>
+        <div>
+          <div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:18}}>✨ Review Your Application</div>
+          <div style={{color:"#64748b",fontSize:12,marginTop:3}}>{job.title} @ {job.company}
+            {hasCL&&<span style={{marginLeft:8,fontSize:10,padding:"1px 6px",borderRadius:3,background:"#7c3aed22",color:"#a78bfa",border:"1px solid #7c3aed44"}}>COVER LETTER</span>}
+          </div>
+        </div>
+        <button className="btn" onClick={onClose} style={{background:"#1e293b",color:"#94a3b8",padding:"4px 10px",borderRadius:6,fontSize:13}}>✕</button>
+      </div>
+
+      {/* Doc tabs */}
+      <div style={{display:"flex",borderBottom:"1px solid #1e3a5f",marginBottom:0}}>
+        <button className={`dtab btn ${activeDoc==="cv"?"on":"off"}`} onClick={()=>setDoc("cv")}>📄 CV / Resume</button>
+        {hasCL&&<button className={`dtab btn ${activeDoc==="cl"?"on":"off"}`} onClick={()=>setDoc("cl")}>✉️ Cover Letter</button>}
+      </div>
+      <div style={{background:"#061122",border:"1px solid #1e3a5f",borderTop:"none",borderRadius:"0 0 8px 8px",padding:16,marginBottom:16}}>
+        {activeDoc==="cv"
+          ? <textarea value={cv||""} onChange={e=>setCV(e.target.value)} style={{width:"100%",minHeight:320,fontFamily:"'DM Mono',monospace",fontSize:12,lineHeight:1.7,resize:"vertical",background:"transparent",border:"none",color:"#cbd5e1",outline:"none",padding:0}}/>
+          : <textarea value={coverLetter||""} onChange={e=>setCL(e.target.value)} style={{width:"100%",minHeight:320,fontFamily:"'DM Mono',monospace",fontSize:12,lineHeight:1.7,resize:"vertical",background:"transparent",border:"none",color:"#cbd5e1",outline:"none",padding:0}}/>
+        }
+      </div>
+
+      {/* What happens next callout */}
+      <div style={{padding:"10px 14px",background:"#0a1e38",border:"1px solid #1e3a5f",borderRadius:8,fontSize:11,color:"#60a5fa",marginBottom:16,lineHeight:1.8}}>
+        <strong>After you approve:</strong><br/>
+        1️⃣ Job page opens in a new tab &nbsp;·&nbsp;
+        2️⃣ Paste your CV &amp; {hasCL?"cover letter":"resume"} where fields appear &nbsp;·&nbsp;
+        3️⃣ Your profile info is shown below for copy-pasting any form fields &nbsp;·&nbsp;
+        4️⃣ Any unknown fields will be asked next
+      </div>
+
+      <div style={{display:"flex",gap:8,justifyContent:"space-between"}}>
+        <div style={{display:"flex",gap:8}}>
+          <button className="btn" onClick={()=>{navigator.clipboard.writeText(cv||"");showToast("CV copied!");}} style={{padding:"7px 13px",background:"#1e293b",color:"#94a3b8",borderRadius:8,fontSize:12}}>📋 Copy CV</button>
+          {hasCL&&<button className="btn" onClick={()=>{navigator.clipboard.writeText(coverLetter||"");showToast("Cover letter copied!");}} style={{padding:"7px 13px",background:"#1e293b",color:"#94a3b8",borderRadius:8,fontSize:12}}>📋 Copy Letter</button>}
+        </div>
+        <button className="btn" onClick={onApprove} style={{padding:"9px 24px",background:"linear-gradient(135deg,#2563eb,#7c3aed)",color:"white",borderRadius:8,fontSize:13,fontWeight:700}}>
+          ✅ Approve &amp; Apply →
+        </button>
+      </div>
+    </>
+  );
+}
+
+function MissingFieldsStage({flow, onSubmit, onBack}) {
+  const {job, missingFields, extraAnswers} = flow;
+  const [answers, setAnswers] = useState(extraAnswers||{});
+  const setAns = (field,val) => setAnswers(p=>({...p,[field]:val}));
+  const allFilled = missingFields.every(f=>answers[f.field]);
+
+  return (
+    <>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:18}}>
+        <div>
+          <div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:18}}>❓ A Few More Details</div>
+          <div style={{color:"#64748b",fontSize:12,marginTop:3}}>{job.title} @ {job.company} — not found in your profile</div>
+        </div>
+        <button className="btn" onClick={onBack} style={{background:"#1e293b",color:"#94a3b8",padding:"4px 10px",borderRadius:6,fontSize:12}}>← Back</button>
+      </div>
+
+      <div style={{padding:"10px 14px",background:"#1a1000",border:"1px solid #78350f44",borderRadius:8,fontSize:11,color:"#fbbf24",marginBottom:18,lineHeight:1.6}}>
+        ℹ️ These fields were detected in the job form but aren't in your profile. Your answers will be saved for future applications.
+      </div>
+
+      <div style={{display:"flex",flexDirection:"column",gap:14,marginBottom:22}}>
+        {missingFields.map(f=>(
+          <div key={f.field}>
+            <div className="sl">{f.question}</div>
+            {f.type==="select"
+              ? <select value={answers[f.field]||""} onChange={e=>setAns(f.field,e.target.value)}>
+                  <option value="">Select…</option>
+                  {(f.options||[]).map(o=><option key={o} value={o}>{o}</option>)}
+                </select>
+              : <input type={f.type==="number"?"number":"text"} value={answers[f.field]||""} onChange={e=>setAns(f.field,e.target.value)} placeholder={`Enter ${f.field}…`}/>
+            }
+          </div>
+        ))}
+      </div>
+
+      <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
+        <button className="btn" onClick={onBack} style={{padding:"8px 16px",background:"#1e293b",color:"#94a3b8",borderRadius:8,fontSize:13}}>← Review Docs</button>
+        <button className="btn" onClick={()=>onSubmit(answers)} disabled={!allFilled}
+          style={{padding:"9px 24px",background:allFilled?"linear-gradient(135deg,#2563eb,#7c3aed)":"#1e293b",color:"white",borderRadius:8,fontSize:13,fontWeight:700}}>
+          🚀 Submit &amp; Apply
+        </button>
+      </div>
+
+      {!allFilled&&<div style={{textAlign:"center",fontSize:11,color:"#475569",marginTop:10}}>Fill all fields above to continue</div>}
+    </>
+  );
+}
+
+// ─── Jobs Tab ─────────────────────────────────────────────────────────────────
+function JobsTab({jobs,allJobs,loading,minScore,setMinScore,selPlatforms,setSelPlatforms,remoteFilter,setRemoteFilter,sourceFilter,setSourceFilter,selectedJob,setSelectedJob,onRefresh,onApply,applied,profile}) {
+  const emailCount = allJobs.filter(j=>j.source==="email").length;
+  return (
+    <div>
+      {/* Filters */}
+      <div style={{background:"#0a1628",border:"1px solid #1e293b",borderRadius:10,padding:"16px 20px",marginBottom:20}}>
+        <div style={{display:"flex",flexWrap:"wrap",gap:14,alignItems:"center"}}>
+          {/* Platforms */}
+          <div>
+            <div className="sl">Platforms</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
+              {PLATFORMS.map(p=>{const on=selPlatforms.includes(p.id);return(
+                <span key={p.id} className="pill" onClick={()=>setSelPlatforms(prev=>prev.includes(p.id)?prev.filter(x=>x!==p.id):[...prev,p.id])}
+                  style={{background:on?p.color+"22":"transparent",color:on?p.color:"#475569",borderColor:on?p.color+"66":"#1e293b"}}>
+                  {on?"●":"○"} {p.name}
+                  {p.realApi&&<span style={{fontSize:9,background:"#22c55e22",color:"#22c55e",padding:"1px 4px",borderRadius:3}}>LIVE</span>}
+                  {p.emailSource&&<span style={{fontSize:9,background:"#065f4622",color:"#34d399",padding:"1px 4px",borderRadius:3}}>📧</span>}
+                  {p.coverLetter&&<span style={{fontSize:9,background:"#7c3aed22",color:"#a78bfa",padding:"1px 4px",borderRadius:3}}>CL</span>}
+                </span>);})}
+            </div>
+          </div>
+          <div style={{width:1,height:32,background:"#1e293b",flexShrink:0}}/>
+          {/* Work type */}
+          <div>
+            <div className="sl">Work Type</div>
+            <div style={{display:"flex",gap:5}}>
+              {[["all","All"],["remote","🌍 Remote"],["office","🏢 BLR"]].map(([v,l])=>(
+                <span key={v} className="pill" onClick={()=>setRemoteFilter(v)}
+                  style={{background:remoteFilter===v?"#3b82f622":"transparent",color:remoteFilter===v?"#60a5fa":"#475569",borderColor:remoteFilter===v?"#3b82f644":"#1e293b"}}>{l}</span>
+              ))}
+            </div>
+          </div>
+          <div style={{width:1,height:32,background:"#1e293b",flexShrink:0}}/>
+          {/* Source */}
+          <div>
+            <div className="sl">Source</div>
+            <div style={{display:"flex",gap:5}}>
+              {[["all","All"],["email","📧 Email"],["board","🔍 Board"]].map(([v,l])=>(
+                <span key={v} className="pill" onClick={()=>setSourceFilter(v)}
+                  style={{background:sourceFilter===v?"#3b82f622":"transparent",color:sourceFilter===v?"#60a5fa":"#475569",borderColor:sourceFilter===v?"#3b82f644":"#1e293b"}}>{l}</span>
+              ))}
+            </div>
+          </div>
+          <div style={{width:1,height:32,background:"#1e293b",flexShrink:0}}/>
+          {/* Score */}
+          <div style={{minWidth:180}}>
+            <div className="sl">Min Match: <span style={{color:"#60a5fa"}}>{minScore}%</span></div>
+            <input type="range" min={0} max={90} step={5} value={minScore}
+              onChange={e=>setMinScore(Number(e.target.value))}
+              className="slider" style={{"--val":`${minScore}%`,width:"100%"}}/>
+          </div>
+          <div style={{flex:1}}/>
+          <button className="btn" onClick={onRefresh} style={{background:"#1e3a5f",color:"#60a5fa",padding:"8px 14px",borderRadius:8,fontSize:12,border:"1px solid #2563eb44"}}>
+            {loading?"⟳ …":"⟳ Refresh"}
+          </button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div style={{display:"flex",gap:10,marginBottom:18,fontSize:12,color:"#475569",flexWrap:"wrap",alignItems:"center"}}>
+        <span><span style={{color:"#60a5fa",fontWeight:700}}>{jobs.length}</span> shown</span>·
+        <span><span style={{color:"#22c55e",fontWeight:700}}>{allJobs.filter(j=>(j.score||0)>=75).length}</span> strong matches</span>·
+        <span><span style={{color:"#34d399",fontWeight:700}}>{emailCount}</span> from email</span>·
+        <span><span style={{color:"#f59e0b",fontWeight:700}}>{allJobs.filter(j=>j.remote).length}</span> remote</span>·
+        <span><span style={{color:"#4ade80",fontWeight:700}}>{applied.size}</span> applied</span>
+      </div>
+
+      {/* Split */}
+      <div style={{display:"grid",gridTemplateColumns:selectedJob?"380px 1fr":"1fr",gap:16}}>
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          {loading&&!jobs.length
+            ?<div style={{textAlign:"center",padding:"60px 0",color:"#475569"}}><div className="spin" style={{fontSize:28}}>⟳</div><div style={{marginTop:10,fontSize:13}}>Fetching…</div></div>
+            :jobs.length===0
+            ?<div style={{textAlign:"center",padding:"60px 0",color:"#475569"}}><div style={{fontSize:36}}>🔍</div><div style={{marginTop:10}}>No jobs match filters</div></div>
+            :jobs.map(job=>(
+              <JobCard key={job.id} job={job}
+                selected={selectedJob?.id===job.id}
+                wasApplied={applied.has(job.id)}
+                onClick={()=>setSelectedJob(p=>p?.id===job.id?null:job)}
+                onApply={()=>onApply(job)} compact={!!selectedJob}/>
+            ))
+          }
+        </div>
+
+        {selectedJob&&(
+          <div className="fade" style={{background:"#0a1628",border:"1px solid #1e293b",borderRadius:10,padding:"22px",position:"sticky",top:16,alignSelf:"flex-start",maxHeight:"85vh",overflow:"auto"}}>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:16}}>
+              <div>
+                <div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:18,lineHeight:1.2}}>{selectedJob.title}</div>
+                <div style={{color:"#64748b",fontSize:13,marginTop:4}}>{selectedJob.company}</div>
+              </div>
+              <button className="btn" onClick={()=>setSelectedJob(null)} style={{background:"#1e293b",color:"#94a3b8",padding:"4px 10px",borderRadius:6,fontSize:13}}>✕</button>
+            </div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:16}}>
+              <ScoreBadge score={selectedJob.score} loading={selectedJob.scoreLoading}/>
+              <span className="tag" style={{background:"#1e293b",color:"#94a3b8"}}>📍 {selectedJob.location}</span>
+              <span className="tag" style={{background:"#1e293b",color:"#94a3b8"}}>{selectedJob.country}</span>
+              <span className="tag" style={{background:selectedJob.remote?"#06402b":"#1e293b",color:selectedJob.remote?"#4ade80":"#94a3b8"}}>{selectedJob.remote?"🌍 Remote":"🏢 Office"}</span>
+              <SourceBadge source={selectedJob.source}/>
+              {selectedJob.salary&&<span className="tag" style={{background:"#1e2a1e",color:"#4ade80"}}>💰 {selectedJob.salary}</span>}
+              {applied.has(selectedJob.id)&&<span className="applied-badge">✓ APPLIED</span>}
+            </div>
+            {selectedJob.reasons?.length>0&&(
+              <div style={{marginBottom:16}}>
+                <div className="sl">Match Insights</div>
+                {selectedJob.reasons.map((r,i)=><div key={i} style={{fontSize:12,color:"#94a3b8",padding:"4px 0",borderBottom:"1px solid #0f172a"}}>• {r}</div>)}
+              </div>
+            )}
+            {PLATFORMS.find(p=>p.id===selectedJob.platform)?.coverLetter&&(
+              <div style={{padding:"8px 12px",background:"#1a0b2e",border:"1px solid #7c3aed44",borderRadius:8,fontSize:11,color:"#a78bfa",marginBottom:12}}>
+                ✉️ Cover letter will be auto-generated for this platform
+              </div>
+            )}
+            <div className="sl">Description</div>
+            <div style={{fontSize:12,color:"#94a3b8",lineHeight:1.8,whiteSpace:"pre-wrap",background:"#061122",borderRadius:8,padding:14,marginBottom:16}}>
+              {selectedJob.description}
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <a href={selectedJob.url} target="_blank" rel="noreferrer"
+                style={{flex:1,textAlign:"center",padding:"9px",background:"#1e293b",color:"#94a3b8",borderRadius:8,fontSize:12,textDecoration:"none"}}>
+                🔗 View Job
+              </a>
+              <button className="btn" onClick={()=>onApply(selectedJob)}
+                style={{flex:2,padding:"9px",background:"linear-gradient(135deg,#2563eb,#7c3aed)",color:"white",borderRadius:8,fontSize:12,fontWeight:600}}>
+                {applied.has(selectedJob.id)?"✓ Applied — Apply Again":"✨ Generate Docs &amp; Apply"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function JobCard({job, selected, wasApplied, onClick, onApply, compact}) {
+  const plat = PLATFORMS.find(p=>p.id===job.platform)||{color:"#64748b"};
+  return (
+    <div className="jcard fade" onClick={onClick}
+      style={{background:selected?"#0d1f38":"#080f1e",borderRadius:10,padding:"14px 16px",cursor:"pointer",borderColor:selected?"#2563eb44":"#1e293b",opacity:wasApplied?0.65:1}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontFamily:"'Syne',sans-serif",fontWeight:600,fontSize:compact?13:14,lineHeight:1.3,marginBottom:2}}>{job.title}</div>
+          <div style={{fontSize:12,color:"#64748b"}}>{job.company}</div>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4}}>
+          <ScoreBadge score={job.score} loading={job.scoreLoading}/>
+          {wasApplied&&<span className="applied-badge">✓ APPLIED</span>}
+        </div>
+      </div>
+      <div style={{display:"flex",flexWrap:"wrap",gap:5,marginTop:10,alignItems:"center"}}>
+        <span className="tag" style={{background:plat.color+"18",color:plat.color,border:`1px solid ${plat.color}33`,fontSize:10}}>{plat.name}</span>
+        <span className="tag" style={{background:job.remote?"#06402b":"#1e2a3a",color:job.remote?"#4ade80":"#60a5fa",fontSize:10}}>{job.remote?"🌍 Remote":"🏢 BLR"}</span>
+        <span className="tag" style={{background:"#1e293b",color:"#94a3b8",fontSize:10}}>{job.country}</span>
+        <SourceBadge source={job.source}/>
+        {!compact&&<span style={{flex:1}}/>}
+        {!compact&&<button className="btn" onClick={e=>{e.stopPropagation();onApply();}} style={{padding:"4px 12px",background:"linear-gradient(135deg,#2563eb88,#7c3aed88)",color:"white",borderRadius:6,fontSize:11,fontWeight:600}}>Apply ✨</button>}
+      </div>
+      {!compact&&job.postedAt&&<div style={{fontSize:10,color:"#334155",marginTop:6}}>{job.postedAt}</div>}
+    </div>
+  );
+}
+
+// ─── Profile Tab ──────────────────────────────────────────────────────────────
+function ProfileTab({profile, onSave}) {
+  const [p, setP] = useState(profile);
+  const [section, setSection] = useState("basic");
+  const set=(f,v)=>setP(prev=>({...prev,[f]:v}));
+  const setExp=(i,f,v)=>{const e=[...p.experience];e[i]={...e[i],[f]:v};setP(prev=>({...prev,experience:e}));};
+  const addExp=()=>setP(prev=>({...prev,experience:[...prev.experience,{company:"",role:"",duration:"",description:""}]}));
+  const remExp=(i)=>setP(prev=>({...prev,experience:prev.experience.filter((_,idx)=>idx!==i)}));
+  const setEdu=(i,f,v)=>{const e=[...p.education];e[i]={...e[i],[f]:v};setP(prev=>({...prev,education:e}));};
+  const addEdu=()=>setP(prev=>({...prev,education:[...prev.education,{institution:"",degree:"",year:""}]}));
+  const remEdu=(i)=>setP(prev=>({...prev,education:prev.education.filter((_,idx)=>idx!==i)}));
+
+  const Sec=({title,children})=><div style={{background:"#0a1628",border:"1px solid #1e293b",borderRadius:10,padding:"20px",marginBottom:16}}><div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:14,marginBottom:16,color:"#60a5fa"}}>{title}</div>{children}</div>;
+  const F=({label,...props})=><div style={{marginBottom:12}}><div className="sl">{label}</div>{props.rows?<textarea {...props} style={{resize:"vertical",minHeight:props.rows*22}}/>:<input {...props}/>}</div>;
+
+  return (
+    <div style={{maxWidth:740}}>
+      <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:22,marginBottom:20}}>👤 Your Profile</div>
+      <div style={{display:"flex",gap:6,marginBottom:20,flexWrap:"wrap"}}>
+        {[["basic","🧑 Basic"],["links","🔗 Links & CTC"],["experience","💼 Experience"],["education","🎓 Education"],["templates","📄 Templates"]].map(([id,label])=>(
+          <button key={id} className="btn" onClick={()=>setSection(id)}
+            style={{padding:"6px 14px",borderRadius:20,fontSize:12,fontFamily:"inherit",background:section===id?"#1e3a5f":"transparent",color:section===id?"#60a5fa":"#475569",border:`1px solid ${section===id?"#2563eb44":"#1e293b"}`}}>{label}</button>
+        ))}
+      </div>
+
+      {section==="basic"&&<Sec title="Basic Info">
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+          <F label="Full Name" value={p.name} onChange={e=>set("name",e.target.value)} placeholder="Rahul Sharma"/>
+          <F label="Email" value={p.email} onChange={e=>set("email",e.target.value)} placeholder="rahul@email.com"/>
+          <F label="Phone" value={p.phone} onChange={e=>set("phone",e.target.value)} placeholder="+91 98765 43210"/>
+          <F label="Location" value={p.location} onChange={e=>set("location",e.target.value)} placeholder="Bengaluru, India"/>
+        </div>
+        <F label="Current Title" value={p.title} onChange={e=>set("title",e.target.value)} placeholder="Senior Software Engineer"/>
+        <F label="Professional Summary" value={p.summary} onChange={e=>set("summary",e.target.value)} placeholder="8 years building scalable backend systems…" rows={4}/>
+        <F label="Skills (comma-separated)" value={p.skills} onChange={e=>set("skills",e.target.value)} placeholder="Node.js, React, PostgreSQL, AWS, Docker, Kubernetes, System Design…" rows={3}/>
+      </Sec>}
+
+      {section==="links"&&<Sec title="Links, CTC & Notice Period">
+        <div style={{fontSize:12,color:"#475569",marginBottom:14,lineHeight:1.6}}>These fields are used to auto-fill job application forms. Any field left blank will be asked when you apply.</div>
+        <F label="LinkedIn URL" value={p.linkedin} onChange={e=>set("linkedin",e.target.value)} placeholder="https://linkedin.com/in/yourname"/>
+        <F label="GitHub URL" value={p.github} onChange={e=>set("github",e.target.value)} placeholder="https://github.com/yourname"/>
+        <F label="Portfolio / Website" value={p.portfolio} onChange={e=>set("portfolio",e.target.value)} placeholder="https://yoursite.dev"/>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
+          <F label="Current CTC (LPA)" value={p.currentCTC} onChange={e=>set("currentCTC",e.target.value)} placeholder="25"/>
+          <F label="Expected CTC (LPA)" value={p.expectedCTC} onChange={e=>set("expectedCTC",e.target.value)} placeholder="35"/>
+          <F label="Notice Period" value={p.noticePeriod} onChange={e=>set("noticePeriod",e.target.value)} placeholder="30 days"/>
+        </div>
+      </Sec>}
+
+      {section==="experience"&&<Sec title="Work Experience">
+        {p.experience.map((exp,i)=>(
+          <div key={i} style={{border:"1px solid #1e293b",borderRadius:8,padding:"14px",marginBottom:10}}>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}>
+              <span style={{fontSize:12,color:"#475569"}}>Experience {i+1}</span>
+              {p.experience.length>1&&<button className="btn" onClick={()=>remExp(i)} style={{background:"#2d0f0f",color:"#ef4444",padding:"2px 8px",borderRadius:4,fontSize:11}}>Remove</button>}
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+              <F label="Company" value={exp.company} onChange={e=>setExp(i,"company",e.target.value)} placeholder="Flipkart"/>
+              <F label="Role" value={exp.role} onChange={e=>setExp(i,"role",e.target.value)} placeholder="Senior Software Engineer"/>
+            </div>
+            <F label="Duration" value={exp.duration} onChange={e=>setExp(i,"duration",e.target.value)} placeholder="Jan 2021 – Present"/>
+            <F label="Description" value={exp.description} onChange={e=>setExp(i,"description",e.target.value)} placeholder="Led backend architecture…" rows={3}/>
+          </div>
+        ))}
+        <button className="btn" onClick={addExp} style={{background:"#1e293b",color:"#60a5fa",padding:"7px 14px",borderRadius:8,fontSize:12}}>+ Add Experience</button>
+      </Sec>}
+
+      {section==="education"&&<Sec title="Education">
+        {p.education.map((edu,i)=>(
+          <div key={i} style={{border:"1px solid #1e293b",borderRadius:8,padding:"14px",marginBottom:10}}>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}>
+              <span style={{fontSize:12,color:"#475569"}}>Education {i+1}</span>
+              {p.education.length>1&&<button className="btn" onClick={()=>remEdu(i)} style={{background:"#2d0f0f",color:"#ef4444",padding:"2px 8px",borderRadius:4,fontSize:11}}>Remove</button>}
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 100px",gap:10}}>
+              <F label="Institution" value={edu.institution} onChange={e=>setEdu(i,"institution",e.target.value)} placeholder="IIT Bombay"/>
+              <F label="Degree" value={edu.degree} onChange={e=>setEdu(i,"degree",e.target.value)} placeholder="B.Tech Computer Science"/>
+              <F label="Year" value={edu.year} onChange={e=>setEdu(i,"year",e.target.value)} placeholder="2018"/>
+            </div>
+          </div>
+        ))}
+        <button className="btn" onClick={addEdu} style={{background:"#1e293b",color:"#60a5fa",padding:"7px 14px",borderRadius:8,fontSize:12}}>+ Add Education</button>
+      </Sec>}
+
+      {section==="templates"&&<>
+        <Sec title="📄 CV Template">
+          <div style={{fontSize:12,color:"#475569",marginBottom:10,lineHeight:1.6}}>Placeholders: {["{name}","{title}","{email}","{phone}","{location}","{summary}","{skills}","{experience}","{education}"].map(ph=><code key={ph} style={{color:"#60a5fa",marginRight:4}}>{ph}</code>)}</div>
+          <textarea value={p.cvTemplate} onChange={e=>set("cvTemplate",e.target.value)} style={{width:"100%",minHeight:240,fontFamily:"'DM Mono',monospace",fontSize:12,lineHeight:1.7,resize:"vertical"}}/>
+          <button className="btn" onClick={()=>set("cvTemplate",DEFAULT_CV_TEMPLATE)} style={{marginTop:8,background:"#1e293b",color:"#64748b",padding:"5px 12px",borderRadius:6,fontSize:11}}>↩ Reset</button>
+        </Sec>
+        <Sec title="✉️ Cover Letter Template">
+          <div style={{padding:"10px 14px",background:"#0a1e10",border:"1px solid #166534",borderRadius:8,fontSize:11,color:"#4ade80",marginBottom:12,lineHeight:1.6}}>
+            ✅ Auto-generated for <strong>LinkedIn, Indeed, Naukri</strong> (marked CL). AI fills all placeholders from your profile.
+          </div>
+          <div style={{fontSize:12,color:"#475569",marginBottom:10,lineHeight:1.6}}>Placeholders: {["{name}","{email}","{phone}","{date}","{title}","{company}","{years_experience}","{top_skills}","{why_company_paragraph}","{key_achievements_paragraph}"].map(ph=><code key={ph} style={{color:"#a78bfa",marginRight:4}}>{ph}</code>)}</div>
+          <textarea value={p.coverLetterTemplate} onChange={e=>set("coverLetterTemplate",e.target.value)} style={{width:"100%",minHeight:280,fontFamily:"'DM Mono',monospace",fontSize:12,lineHeight:1.7,resize:"vertical"}}/>
+          <button className="btn" onClick={()=>set("coverLetterTemplate",DEFAULT_COVER_LETTER_TEMPLATE)} style={{marginTop:8,background:"#1e293b",color:"#64748b",padding:"5px 12px",borderRadius:6,fontSize:11}}>↩ Reset</button>
+        </Sec>
+      </>}
+
+      <button className="btn" onClick={()=>onSave(p)} style={{width:"100%",padding:"12px",background:"linear-gradient(135deg,#2563eb,#7c3aed)",color:"white",borderRadius:10,fontSize:14,fontWeight:700,fontFamily:"inherit",marginTop:4}}>
+        💾 Save Profile
+      </button>
+    </div>
+  );
+}
+
+
+// ─── Mount ───────────────────────────────────────────────────────────────────
+const container = document.getElementById('root');
+const reactRoot = ReactDOM.createRoot(container);
+reactRoot.render(React.createElement(App));
+
+// Hide splash once mounted
+setTimeout(() => {
+  const splash = document.getElementById('splash');
+  if (splash) { splash.classList.add('hide'); setTimeout(() => splash.remove(), 600); }
+}, 800);
+</script>
+
+<script>
+// ─── Service Worker registration ─────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(r => console.log('SW registered:', r.scope))
+      .catch(e => console.warn('SW failed:', e));
+  });
+}
+
+// ─── PWA Install prompt ───────────────────────────────────────────────────────
+let deferredPrompt;
+const banner  = document.getElementById('install-banner');
+const instBtn = document.getElementById('install-btn');
+const dismBtn = document.getElementById('dismiss-btn');
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show banner after 5s so user sees the app first
+  setTimeout(() => banner.classList.add('show'), 5000);
+});
+
+instBtn.addEventListener('click', async () => {
+  banner.classList.remove('show');
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log('Install outcome:', outcome);
+    deferredPrompt = null;
+  }
+});
+
+dismBtn.addEventListener('click', () => banner.classList.remove('show'));
+
+window.addEventListener('appinstalled', () => {
+  banner.classList.remove('show');
+  deferredPrompt = null;
+  console.log('App installed!');
+});
+
+// ─── Offline detection ────────────────────────────────────────────────────────
+const offlineBar = document.getElementById('offline-bar');
+function updateOnlineStatus() {
+  offlineBar.classList.toggle('show', !navigator.onLine);
+}
+window.addEventListener('online',  updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+</script>
+
+</body>
+</html>
