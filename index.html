@@ -1042,10 +1042,10 @@ function App() {
           Authorization: "Bearer ".concat(token)
         }
       }).then(function (r) {
-        return r.json();
+        return r.ok ? r.json() : Promise.reject(r.status);
       }).then(function (u) {
-        return setGmailUser(u);
-      }).catch(function () {});
+        if (u && !u.error) setGmailUser(u);
+      }).catch(function (e) { console.log('[JobHunt] userinfo error:', e); });
     });
     // Check for existing valid token
     var stored = getStoredToken();
@@ -1056,11 +1056,13 @@ function App() {
           Authorization: "Bearer ".concat(stored)
         }
       }).then(function (r) {
-        return r.json();
+        return r.ok ? r.json() : Promise.reject('HTTP ' + r.status);
       }).then(function (u) {
-        return setGmailUser(u);
-      }).catch(function () {
-        return setGmailReady(false);
+        if (u && !u.error) { setGmailUser(u); } else { throw new Error(u.error || 'bad response'); }
+      }).catch(function (e) {
+        console.log('[JobHunt] Stored token expired/invalid:', e);
+        ls.set(GTOKEN_KEY, null);
+        setGmailReady(false);
       });
     }
   }, []);
@@ -1246,21 +1248,22 @@ function App() {
       return _regenerator().w(function (_context5) {
         while (1) switch (_context5.p = _context5.n) {
           case 0:
+            // Always get a fresh token to avoid 401s
+            if (!tokenClient) {
+              showToast("Google Auth not ready yet, try again", "error");
+              return _context5.a(2);
+            }
             token = getStoredToken();
             if (token) {
-              _context5.n = 2;
-              break;
-            }
-            if (tokenClient) {
               _context5.n = 1;
               break;
             }
-            showToast("Google Auth not ready yet, try again", "error");
+            // No valid token: request one — user will be prompted, then must tap Sync again
+            ls.set(GTOKEN_KEY, null);
+            tokenClient.requestAccessToken({prompt: ''});
+            showToast("Signing in\u2026 tap Sync again after Google prompt", "info");
             return _context5.a(2);
           case 1:
-            tokenClient.requestAccessToken();
-            return _context5.a(2);
-          case 2:
             setFetchingEmail(true);
             _context5.p = 3;
             _context5.n = 4;
@@ -1286,11 +1289,15 @@ function App() {
           case 5:
             _context5.p = 5;
             _t5 = _context5.v;
-            if (_t5.message === "Token expired") {
+            if (_t5.message === "Token expired" || (_t5.message && (_t5.message.includes("401") || _t5.message.includes("invalid_request") || _t5.message.includes("Invalid Credentials")))) {
               ls.set(GTOKEN_KEY, null);
               setGmailReady(false);
-              showToast("Session expired — sign in again", "error");
-            } else showToast("Email sync failed: " + _t5.message, "error");
+              setGmailUser(null);
+              showToast("Session expired \u2014 please sign in with Google again", "error");
+            } else {
+              showToast("Email sync failed: " + _t5.message, "error");
+              console.error("[JobHunt] Sync error:", _t5);
+            }
           case 6:
             setFetchingEmail(false);
           case 7:
