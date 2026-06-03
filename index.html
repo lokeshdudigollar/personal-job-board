@@ -63,19 +63,21 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <script>
+"use strict";
+
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 var _excluded = ["label"];
+function _regeneratorValues(e) { if (null != e) { var t = e["function" == typeof Symbol && Symbol.iterator || "@@iterator"], r = 0; if (t) return t.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) return { next: function next() { return e && r >= e.length && (e = void 0), { value: e && e[r++], done: !e }; } }; } throw new TypeError(_typeof(e) + " is not iterable"); }
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 function _objectWithoutProperties(e, t) { if (null == e) return {}; var o, r, i = _objectWithoutPropertiesLoose(e, t); if (Object.getOwnPropertySymbols) { var n = Object.getOwnPropertySymbols(e); for (r = 0; r < n.length; r++) o = n[r], -1 === t.indexOf(o) && {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]); } return i; }
 function _objectWithoutPropertiesLoose(r, e) { if (null == r) return {}; var t = {}; for (var n in r) if ({}.hasOwnProperty.call(r, n)) { if (-1 !== e.indexOf(n)) continue; t[n] = r[n]; } return t; }
-function _regeneratorValues(e) { if (null != e) { var t = e["function" == typeof Symbol && Symbol.iterator || "@@iterator"], r = 0; if (t) return t.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) return { next: function next() { return e && r >= e.length && (e = void 0), { value: e && e[r++], done: !e }; } }; } throw new TypeError(_typeof(e) + " is not iterable"); }
-function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */ var e, t, r = "function" == typeof Symbol ? Symbol : {}, n = r.iterator || "@@iterator", o = r.toStringTag || "@@toStringTag"; function i(r, n, o, i) { var c = n && n.prototype instanceof Generator ? n : Generator, u = Object.create(c.prototype); return _regeneratorDefine2(u, "_invoke", function (r, n, o) { var i, c, u, f = 0, p = o || [], y = !1, G = { p: 0, n: 0, v: e, a: d, f: d.bind(e, 4), d: function d(t, r) { return i = t, c = 0, u = e, G.n = r, a; } }; function d(r, n) { for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) { var o, i = p[t], d = G.p, l = i[2]; r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0)); } if (o || r > 1) return a; throw y = !0, n; } return function (o, p, l) { if (f > 1) throw TypeError("Generator is already running"); for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) { i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u); try { if (f = 2, i) { if (c || (o = "next"), t = i[o]) { if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object"); if (!t.done) return t; u = t.value, c < 2 && (c = 0); } else 1 === c && (t = i.return) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1); i = e; } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break; } catch (t) { i = e, c = 1, u = t; } finally { f = 1; } } return { value: t, done: y }; }; }(r, o, i), !0), u; } var a = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} t = Object.getPrototypeOf; var c = [][n] ? t(t([][n]())) : (_regeneratorDefine2(t = {}, n, function () { return this; }), t), u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c); function f(e) { return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, _regeneratorDefine2(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, _regeneratorDefine2(u, "constructor", GeneratorFunctionPrototype), _regeneratorDefine2(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", _regeneratorDefine2(GeneratorFunctionPrototype, o, "GeneratorFunction"), _regeneratorDefine2(u), _regeneratorDefine2(u, o, "Generator"), _regeneratorDefine2(u, n, function () { return this; }), _regeneratorDefine2(u, "toString", function () { return "[object Generator]"; }), (_regenerator = function _regenerator() { return { w: i, m: f }; })(); }
+function _createForOfIteratorHelper(r, e) { var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (!t) { if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t["return"] || t["return"](); } finally { if (u) throw o; } } }; }
+function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */ var e, t, r = "function" == typeof Symbol ? Symbol : {}, n = r.iterator || "@@iterator", o = r.toStringTag || "@@toStringTag"; function i(r, n, o, i) { var c = n && n.prototype instanceof Generator ? n : Generator, u = Object.create(c.prototype); return _regeneratorDefine2(u, "_invoke", function (r, n, o) { var i, c, u, f = 0, p = o || [], y = !1, G = { p: 0, n: 0, v: e, a: d, f: d.bind(e, 4), d: function d(t, r) { return i = t, c = 0, u = e, G.n = r, a; } }; function d(r, n) { for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) { var o, i = p[t], d = G.p, l = i[2]; r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0)); } if (o || r > 1) return a; throw y = !0, n; } return function (o, p, l) { if (f > 1) throw TypeError("Generator is already running"); for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) { i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u); try { if (f = 2, i) { if (c || (o = "next"), t = i[o]) { if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object"); if (!t.done) return t; u = t.value, c < 2 && (c = 0); } else 1 === c && (t = i["return"]) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1); i = e; } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break; } catch (t) { i = e, c = 1, u = t; } finally { f = 1; } } return { value: t, done: y }; }; }(r, o, i), !0), u; } var a = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} t = Object.getPrototypeOf; var c = [][n] ? t(t([][n]())) : (_regeneratorDefine2(t = {}, n, function () { return this; }), t), u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c); function f(e) { return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, _regeneratorDefine2(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, _regeneratorDefine2(u, "constructor", GeneratorFunctionPrototype), _regeneratorDefine2(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", _regeneratorDefine2(GeneratorFunctionPrototype, o, "GeneratorFunction"), _regeneratorDefine2(u), _regeneratorDefine2(u, o, "Generator"), _regeneratorDefine2(u, n, function () { return this; }), _regeneratorDefine2(u, "toString", function () { return "[object Generator]"; }), (_regenerator = function _regenerator() { return { w: i, m: f }; })(); }
 function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); } r ? i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2)); }, _regeneratorDefine2(e, r, n, t); }
-function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-function _createForOfIteratorHelper(r, e) { var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (!t) { if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t.return || t.return(); } finally { if (u) throw o; } } }; }
 function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
 function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
@@ -95,7 +97,7 @@ var _React = React,
   useCallback = _React.useCallback,
   useRef = _React.useRef;
 
-// ─── CONFIG — replace if you rotate keys ─────────────────────────────────────
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
 var GOOGLE_CLIENT_ID = "103943542867-uvt5or72jgohd4st2e30lt7c8bg57una.apps.googleusercontent.com";
 var GEMINI_API_KEY = "AIzaSyB5vqcNa2I8_qMIhYUqbVdhFTOWOW644FY";
 var GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=".concat(GEMINI_API_KEY);
@@ -106,14 +108,14 @@ var STORAGE_KEY = "jobhunt_profile_v3";
 var EMAIL_JOBS_KEY = "jobhunt_email_jobs_v2";
 var APPLIED_KEY = "jobhunt_applied_v1";
 var EXTRA_ANSWERS_KEY = "jobhunt_answers_v1";
-var GTOKEN_KEY = "jobhunt_gtoken_v1";
 var PLATFORMS = [{
   id: "yc",
   name: "YC Jobs",
   color: "#FF6600",
   realApi: true,
   coverLetter: false,
-  emailSource: false
+  emailSource: false,
+  senders: []
 }, {
   id: "linkedin",
   name: "LinkedIn",
@@ -121,7 +123,7 @@ var PLATFORMS = [{
   realApi: false,
   coverLetter: true,
   emailSource: true,
-  senders: ["jobs-noreply@linkedin.com", "jobalerts-noreply@linkedin.com"]
+  senders: ["jobs-noreply@linkedin.com", "jobalerts-noreply@linkedin.com", "linkedin.com"]
 }, {
   id: "indeed",
   name: "Indeed",
@@ -129,7 +131,7 @@ var PLATFORMS = [{
   realApi: false,
   coverLetter: true,
   emailSource: true,
-  senders: ["alert@indeed.com", "indeedemail@indeed.com"]
+  senders: ["alert@indeed.com", "indeedemail@indeed.com", "indeed.com"]
 }, {
   id: "naukri",
   name: "Naukri",
@@ -137,7 +139,7 @@ var PLATFORMS = [{
   realApi: false,
   coverLetter: true,
   emailSource: true,
-  senders: ["no-reply@naukri.com", "naukri@email.naukri.com"]
+  senders: ["no-reply@naukri.com", "naukri@email.naukri.com", "naukri.com"]
 }, {
   id: "instahyre",
   name: "Instahyre",
@@ -145,7 +147,7 @@ var PLATFORMS = [{
   realApi: false,
   coverLetter: false,
   emailSource: true,
-  senders: ["noreply@instahyre.com", "no-reply@instahyre.com", "team@instahyre.com"]
+  senders: ["noreply@instahyre.com", "no-reply@instahyre.com", "team@instahyre.com", "instahyre.com"]
 }, {
   id: "hirist",
   name: "Hirist",
@@ -153,10 +155,10 @@ var PLATFORMS = [{
   realApi: false,
   coverLetter: false,
   emailSource: true,
-  senders: ["info@hirist.com", "info@jobfeed.hirist.com", "info@hirist.tech", "no-reply@hirist.tech", "jobs@hirist.tech"]
+  senders: ["info@hirist.com", "info@jobfeed.hirist.com", "info@hirist.tech", "no-reply@hirist.tech", "hirist.com", "hirist.tech"]
 }];
-var DEFAULT_CV_TEMPLATE = "{name}\n{title}  |  {email}  |  {phone}  |  {location}\n\nPROFESSIONAL SUMMARY\n{summary}\n\nSKILLS\n{skills}\n\nWORK EXPERIENCE\n{experience}\n\nEDUCATION\n{education}";
-var DEFAULT_COVER_LETTER_TEMPLATE = "{date}\n\nHiring Manager\n{company}\n\nDear Hiring Manager,\n\nI am writing to express my strong interest in the {title} position at {company}. With {years_experience} years of experience in software engineering and expertise in {top_skills}, I am confident I can make an immediate impact on your team.\n\n{why_company_paragraph}\n\n{key_achievements_paragraph}\n\nI would welcome the opportunity to discuss how my background aligns with your goals.\n\nWarm regards,\n{name}\n{email}  |  {phone}";
+var DEFAULT_CV = "{name}\n{title}  |  {email}  |  {phone}  |  {location}\n\nPROFESSIONAL SUMMARY\n{summary}\n\nSKILLS\n{skills}\n\nWORK EXPERIENCE\n{experience}\n\nEDUCATION\n{education}";
+var DEFAULT_CL = "{date}\n\nHiring Manager\n{company}\n\nDear Hiring Manager,\n\nI am writing to express my strong interest in the {title} position at {company}. With {years_experience} years of experience in software engineering and expertise in {top_skills}, I am confident I can make an immediate impact on your team.\n\n{why_company_paragraph}\n\n{key_achievements_paragraph}\n\nI would welcome the opportunity to discuss how my background aligns with your goals.\n\nWarm regards,\n{name}\n{email}  |  {phone}";
 var BLANK_PROFILE = {
   name: "",
   email: "",
@@ -176,8 +178,8 @@ var BLANK_PROFILE = {
     degree: "",
     year: ""
   }],
-  cvTemplate: DEFAULT_CV_TEMPLATE,
-  coverLetterTemplate: DEFAULT_COVER_LETTER_TEMPLATE,
+  cvTemplate: DEFAULT_CV,
+  coverLetterTemplate: DEFAULT_CL,
   linkedin: "",
   github: "",
   portfolio: "",
@@ -201,13 +203,18 @@ var ls = {
     try {
       localStorage.setItem(k, JSON.stringify(v));
     } catch (_unused2) {}
+  },
+  del: function del(k) {
+    try {
+      localStorage.removeItem(k);
+    } catch (_unused3) {}
   }
 };
 function loadProfile() {
   var p = ls.get(STORAGE_KEY);
   if (!p) return BLANK_PROFILE;
   return _objectSpread(_objectSpread(_objectSpread({}, BLANK_PROFILE), p), {}, {
-    coverLetterTemplate: p.coverLetterTemplate || DEFAULT_COVER_LETTER_TEMPLATE
+    coverLetterTemplate: p.coverLetterTemplate || DEFAULT_CL
   });
 }
 function loadApplied() {
@@ -225,15 +232,14 @@ function saveExtraAnswers(a) {
   ls.set(EXTRA_ANSWERS_KEY, a);
 }
 
-// ─── Gemini API ───────────────────────────────────────────────────────────────
+// ─── Gemini ───────────────────────────────────────────────────────────────────
 function callGemini(_x) {
   return _callGemini.apply(this, arguments);
 }
 function _callGemini() {
-  _callGemini = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(prompt) {
+  _callGemini = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(prompt) {
     var _d$candidates;
     var jsonMode,
-      body,
       res,
       e,
       d,
@@ -242,26 +248,25 @@ function _callGemini() {
       while (1) switch (_context7.n) {
         case 0:
           jsonMode = _args7.length > 1 && _args7[1] !== undefined ? _args7[1] : false;
-          body = {
-            contents: [{
-              parts: [{
-                text: prompt
-              }]
-            }],
-            generationConfig: _objectSpread({
-              temperature: 0.3,
-              maxOutputTokens: 2048
-            }, jsonMode ? {
-              responseMimeType: "application/json"
-            } : {})
-          };
           _context7.n = 1;
           return fetch(GEMINI_URL, {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: prompt
+                }]
+              }],
+              generationConfig: _objectSpread({
+                temperature: 0.3,
+                maxOutputTokens: 2048
+              }, jsonMode ? {
+                responseMimeType: "application/json"
+              } : {})
+            })
           });
         case 1:
           res = _context7.v;
@@ -281,7 +286,7 @@ function _callGemini() {
           d = _context7.v;
           return _context7.a(2, ((_d$candidates = d.candidates) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates[0]) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates.content) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates.parts) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates[0]) === null || _d$candidates === void 0 ? void 0 : _d$candidates.text) || "");
       }
-    }, _callee5);
+    }, _callee6);
   }));
   return _callGemini.apply(this, arguments);
 }
@@ -289,9 +294,8 @@ function scoreJob(_x2, _x3) {
   return _scoreJob.apply(this, arguments);
 }
 function _scoreJob() {
-  _scoreJob = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(job, profile) {
-    var _profile$summary;
-    var prompt, text, _t6;
+  _scoreJob = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(job, profile) {
+    var t, _t7;
     return _regenerator().w(function (_context8) {
       while (1) switch (_context8.p = _context8.n) {
         case 0:
@@ -301,25 +305,24 @@ function _scoreJob() {
           }
           return _context8.a(2, {
             score: 0,
-            reasons: ["Complete your profile to get match scores"]
+            reasons: ["Complete your profile first"]
           });
         case 1:
-          prompt = "You are a recruiter scoring a candidate-job match.\nCANDIDATE: ".concat(profile.title, ", Skills: ").concat(profile.skills, ", Summary: ").concat((_profile$summary = profile.summary) === null || _profile$summary === void 0 ? void 0 : _profile$summary.slice(0, 300), "\nJOB: ").concat(job.title, " at ").concat(job.company, ". ").concat((job.description || "").slice(0, 500), "\nRespond ONLY with JSON: {\"score\":<0-100>,\"reasons\":[\"reason1\",\"reason2\",\"reason3\"]}");
-          _context8.p = 2;
-          _context8.n = 3;
-          return callGemini(prompt, true);
+          _context8.p = 1;
+          _context8.n = 2;
+          return callGemini("You are a recruiter. Score candidate-job match 0-100.\nCANDIDATE: ".concat(profile.title, ", Skills: ").concat(profile.skills, ", Summary: ").concat((profile.summary || "").slice(0, 300), "\nJOB: ").concat(job.title, " at ").concat(job.company, ". ").concat((job.description || "").slice(0, 400), "\nRespond ONLY with JSON: {\"score\":<number>,\"reasons\":[\"r1\",\"r2\",\"r3\"]}"), true);
+        case 2:
+          t = _context8.v;
+          return _context8.a(2, JSON.parse(t.replace(/```json|```/g, "").trim()));
         case 3:
-          text = _context8.v;
-          return _context8.a(2, JSON.parse(text.replace(/```json|```/g, "").trim()));
-        case 4:
-          _context8.p = 4;
-          _t6 = _context8.v;
+          _context8.p = 3;
+          _t7 = _context8.v;
           return _context8.a(2, {
             score: 50,
-            reasons: ["Could not compute match"]
+            reasons: ["Match score unavailable"]
           });
       }
-    }, _callee6, null, [[2, 4]]);
+    }, _callee7, null, [[1, 3]]);
   }));
   return _scoreJob.apply(this, arguments);
 }
@@ -327,21 +330,19 @@ function generateCuratedCV(_x4, _x5) {
   return _generateCuratedCV.apply(this, arguments);
 }
 function _generateCuratedCV() {
-  _generateCuratedCV = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(job, profile) {
-    var prompt;
+  _generateCuratedCV = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(job, profile) {
     return _regenerator().w(function (_context9) {
       while (1) switch (_context9.n) {
         case 0:
-          prompt = "You are a professional resume writer. Tailor this CV template for the job using ONLY the candidate's real info. Emphasise the most relevant skills and experience.\nPROFILE: ".concat(JSON.stringify(_objectSpread(_objectSpread({}, profile), {}, {
+          _context9.n = 1;
+          return callGemini("You are a professional resume writer. Tailor this CV for the job using ONLY the candidate's real info.\nPROFILE: ".concat(JSON.stringify(_objectSpread(_objectSpread({}, profile), {}, {
             cvTemplate: undefined,
             coverLetterTemplate: undefined
-          })), "\nJOB: ").concat(job.title, " at ").concat(job.company, "\nJOB DESCRIPTION: ").concat((job.description || "").slice(0, 800), "\nCV TEMPLATE:\n").concat(profile.cvTemplate, "\nReturn ONLY the final filled CV text. No preamble or explanation.");
-          _context9.n = 1;
-          return callGemini(prompt);
+          })), "\nJOB: ").concat(job.title, " at ").concat(job.company, "\nDESCRIPTION: ").concat((job.description || "").slice(0, 700), "\nTEMPLATE:\n").concat(profile.cvTemplate, "\nReturn ONLY the filled CV text."));
         case 1:
           return _context9.a(2, _context9.v);
       }
-    }, _callee7);
+    }, _callee8);
   }));
   return _generateCuratedCV.apply(this, arguments);
 }
@@ -349,8 +350,8 @@ function generateCoverLetter(_x6, _x7) {
   return _generateCoverLetter.apply(this, arguments);
 }
 function _generateCoverLetter() {
-  _generateCoverLetter = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(job, profile) {
-    var today, prompt;
+  _generateCoverLetter = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9(job, profile) {
+    var today;
     return _regenerator().w(function (_context0) {
       while (1) switch (_context0.n) {
         case 0:
@@ -359,16 +360,15 @@ function _generateCoverLetter() {
             month: "long",
             year: "numeric"
           });
-          prompt = "You are a professional cover letter writer. Write a compelling personalised cover letter using ONLY the candidate's real data.\nPROFILE: ".concat(JSON.stringify(_objectSpread(_objectSpread({}, profile), {}, {
+          _context0.n = 1;
+          return callGemini("Write a compelling personalised cover letter using ONLY the candidate's real data.\nPROFILE: ".concat(JSON.stringify(_objectSpread(_objectSpread({}, profile), {}, {
             cvTemplate: undefined,
             coverLetterTemplate: undefined
-          })), "\nJOB: ").concat(job.title, " at ").concat(job.company, "\nJOB DESCRIPTION: ").concat((job.description || "").slice(0, 800), "\nTEMPLATE:\n").concat(profile.coverLetterTemplate, "\nFill: {date}=").concat(today, ", {years_experience}=estimate from experience entries, {top_skills}=3-4 most relevant for this role, {why_company_paragraph}=2-3 specific sentences about this company and role, {key_achievements_paragraph}=2-3 achievements from profile relevant to this job.\nReturn ONLY the final cover letter text. No preamble.");
-          _context0.n = 1;
-          return callGemini(prompt);
+          })), "\nJOB: ").concat(job.title, " at ").concat(job.company, "\nDESCRIPTION: ").concat((job.description || "").slice(0, 700), "\nTEMPLATE:\n").concat(profile.coverLetterTemplate, "\n{date}=").concat(today, ", {years_experience}=estimate from experience, {top_skills}=3-4 most relevant skills, {why_company_paragraph}=2-3 specific sentences, {key_achievements_paragraph}=2-3 achievements.\nReturn ONLY the final cover letter."));
         case 1:
           return _context0.a(2, _context0.v);
       }
-    }, _callee8);
+    }, _callee9);
   }));
   return _generateCoverLetter.apply(this, arguments);
 }
@@ -376,8 +376,8 @@ function detectMissingFields(_x8, _x9, _x0) {
   return _detectMissingFields.apply(this, arguments);
 }
 function _detectMissingFields() {
-  _detectMissingFields = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9(job, profile, extraAnswers) {
-    var known, answered, prompt, text, _t7;
+  _detectMissingFields = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(job, profile, extraAnswers) {
+    var known, t, _t8;
     return _regenerator().w(function (_context1) {
       while (1) switch (_context1.p = _context1.n) {
         case 0:
@@ -395,91 +395,134 @@ function _detectMissingFields() {
             currentCTC: profile.currentCTC,
             skills: profile.skills
           };
-          answered = Object.keys(extraAnswers || {});
-          prompt = "You are analysing a job application. Given this job, what fields would a typical application form ask that are NOT already provided?\nJOB: ".concat(job.title, " at ").concat(job.company, "\nDESCRIPTION: ").concat((job.description || "").slice(0, 500), "\nALREADY KNOWN: ").concat(JSON.stringify(known), "\nALREADY ANSWERED: ").concat(answered.join(", ") || "none", "\nReturn ONLY a JSON array: [{\"field\":\"fieldName\",\"question\":\"Human readable question\",\"type\":\"text|number|select\",\"options\":[\"opt1\",\"opt2\"]}]\nOnly genuinely necessary fields not already covered. Max 5. If nothing missing return [].");
           _context1.p = 1;
           _context1.n = 2;
-          return callGemini(prompt, true);
+          return callGemini("Job application form analysis.\nJOB: ".concat(job.title, " at ").concat(job.company, ". ").concat((job.description || "").slice(0, 400), "\nKNOWN FIELDS: ").concat(JSON.stringify(known), "\nALREADY ANSWERED: ").concat(Object.keys(extraAnswers || {}).join(", ") || "none", "\nReturn ONLY a JSON array of missing fields: [{\"field\":\"name\",\"question\":\"Question?\",\"type\":\"text|number|select\",\"options\":[]}]\nMax 5 fields. If nothing missing return []."), true);
         case 2:
-          text = _context1.v;
-          return _context1.a(2, JSON.parse(text.replace(/```json|```/g, "").trim()));
+          t = _context1.v;
+          return _context1.a(2, JSON.parse(t.replace(/```json|```/g, "").trim()));
         case 3:
           _context1.p = 3;
-          _t7 = _context1.v;
+          _t8 = _context1.v;
           return _context1.a(2, []);
       }
-    }, _callee9, null, [[1, 3]]);
+    }, _callee0, null, [[1, 3]]);
   }));
   return _detectMissingFields.apply(this, arguments);
 }
 function parseEmailJobs(_x1, _x10) {
   return _parseEmailJobs.apply(this, arguments);
-} // ─── Gmail OAuth + REST API ───────────────────────────────────────────────────
+} // ─── Gmail OAuth — clean implementation ───────────────────────────────────────
+// NO localStorage token caching — always use tokenClient for fresh tokens
+// This avoids all 401/expired token issues
 function _parseEmailJobs() {
-  _parseEmailJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(emailBodies, platformId) {
+  _parseEmailJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(emailBodies, platformId) {
     var _PLATFORMS$find3;
-    var name, prompt, text, _t8;
+    var name, t, _t9;
     return _regenerator().w(function (_context10) {
       while (1) switch (_context10.p = _context10.n) {
         case 0:
           name = ((_PLATFORMS$find3 = PLATFORMS.find(function (p) {
             return p.id === platformId;
           })) === null || _PLATFORMS$find3 === void 0 ? void 0 : _PLATFORMS$find3.name) || platformId;
-          prompt = "You are a job alert email parser. Extract ALL job listings from these ".concat(name, " job alert emails.\nReturn a JSON array where each item has:\n{\"title\":string,\"company\":string,\"location\":string,\"remote\":boolean,\"url\":string,\"description\":string,\"salary\":string|null}\nRules:\n- remote=true only if \"remote\" is explicitly mentioned in the listing\n- url = the direct job application link\n- description = 2-3 sentence role summary\n- salary = mentioned compensation or null\n- If no jobs found return []\nEMAIL CONTENT:\n").concat(emailBodies.slice(0, 6000), "\nRespond ONLY with a valid JSON array. No explanation, no markdown.");
           _context10.p = 1;
           _context10.n = 2;
-          return callGemini(prompt, true);
+          return callGemini("Extract ALL job listings from these ".concat(name, " job alert emails.\nReturn a JSON array: [{\"title\":string,\"company\":string,\"location\":string,\"remote\":boolean,\"url\":string,\"description\":string,\"salary\":string|null}]\n- remote=true only if explicitly mentioned\n- url = direct job application link (not tracking link)\n- description = 2-3 sentence summary\nIf no jobs found return [].\nEMAIL CONTENT:\n").concat(emailBodies.slice(0, 6000), "\nRespond ONLY with a valid JSON array."), true);
         case 2:
-          text = _context10.v;
-          return _context10.a(2, JSON.parse(text.replace(/```json|```/g, "").trim()));
+          t = _context10.v;
+          return _context10.a(2, JSON.parse(t.replace(/```json|```/g, "").trim()));
         case 3:
           _context10.p = 3;
-          _t8 = _context10.v;
+          _t9 = _context10.v;
           return _context10.a(2, []);
       }
-    }, _callee0, null, [[1, 3]]);
+    }, _callee1, null, [[1, 3]]);
   }));
   return _parseEmailJobs.apply(this, arguments);
 }
-var gmailToken = ls.get(GTOKEN_KEY, null);
 var tokenClient = null;
-function initGoogleAuth(onToken) {
-  // Wait for GSI to load
+var currentAccessToken = null; // in-memory only, never persisted
+
+function initGoogleAuth(onSignedIn) {
   var _tryInit = function tryInit() {
     var _window$google;
     if (!((_window$google = window.google) !== null && _window$google !== void 0 && (_window$google = _window$google.accounts) !== null && _window$google !== void 0 && _window$google.oauth2)) {
-      setTimeout(_tryInit, 200);
+      setTimeout(_tryInit, 300);
       return;
     }
     tokenClient = window.google.accounts.oauth2.initTokenClient({
       client_id: GOOGLE_CLIENT_ID,
-      scope: GMAIL_SCOPE,
-      error_callback: function(err) { console.error("Google OAuth error:", err); },
-      callback: function callback(resp) {
-        if (resp.access_token) {
-          gmailToken = resp.access_token;
-          // Store with expiry (default 1hr)
-          ls.set(GTOKEN_KEY, {
-            token: resp.access_token,
-            exp: Date.now() + 3500 * 1000
-          });
-          onToken(resp.access_token);
+      scope: GMAIL_SCOPE + " https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
+      callback: function () {
+        var _callback = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(resp) {
+          var r, u, _t;
+          return _regenerator().w(function (_context) {
+            while (1) switch (_context.p = _context.n) {
+              case 0:
+                if (!resp.error) {
+                  _context.n = 1;
+                  break;
+                }
+                console.error("[JobHunt] OAuth error:", resp);
+                return _context.a(2);
+              case 1:
+                currentAccessToken = resp.access_token;
+                // Get user info
+                _context.p = 2;
+                _context.n = 3;
+                return fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+                  headers: {
+                    Authorization: "Bearer ".concat(resp.access_token)
+                  }
+                });
+              case 3:
+                r = _context.v;
+                if (r.ok) {
+                  _context.n = 4;
+                  break;
+                }
+                throw new Error("userinfo " + r.status);
+              case 4:
+                _context.n = 5;
+                return r.json();
+              case 5:
+                u = _context.v;
+                if (!u.error) {
+                  _context.n = 6;
+                  break;
+                }
+                throw new Error(u.error);
+              case 6:
+                onSignedIn(u, resp.access_token);
+                _context.n = 8;
+                break;
+              case 7:
+                _context.p = 7;
+                _t = _context.v;
+                console.error("[JobHunt] userinfo failed:", _t);
+                currentAccessToken = null;
+              case 8:
+                return _context.a(2);
+            }
+          }, _callee, null, [[2, 7]]);
+        }));
+        function callback(_x11) {
+          return _callback.apply(this, arguments);
         }
+        return callback;
+      }(),
+      error_callback: function error_callback(err) {
+        console.error("[JobHunt] token client error:", err);
       }
     });
   };
   _tryInit();
 }
-function getStoredToken() {
-  var stored = ls.get(GTOKEN_KEY, null);
-  if (stored && stored.exp > Date.now()) return stored.token;
-  return null;
-}
-function gmailFetch(_x11, _x12) {
+function gmailFetch(_x12, _x13) {
   return _gmailFetch.apply(this, arguments);
 }
 function _gmailFetch() {
-  _gmailFetch = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(path, token) {
+  _gmailFetch = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10(path, token) {
     var res;
     return _regenerator().w(function (_context11) {
       while (1) switch (_context11.n) {
@@ -496,37 +539,40 @@ function _gmailFetch() {
             _context11.n = 2;
             break;
           }
-          ls.set(GTOKEN_KEY, null);
-          throw new Error("Token expired");
+          currentAccessToken = null;
+          throw new Error("Token expired — please sign in again");
         case 2:
+          if (res.ok) {
+            _context11.n = 3;
+            break;
+          }
+          throw new Error("Gmail API error ".concat(res.status));
+        case 3:
           return _context11.a(2, res.json());
       }
-    }, _callee1);
+    }, _callee10);
   }));
   return _gmailFetch.apply(this, arguments);
 }
 function b64decode(str) {
   try {
-    var s = str.replace(/-/g, "+").replace(/_/g, "/");
-    return decodeURIComponent(escape(atob(s)));
-  } catch (_unused3) {
+    return decodeURIComponent(escape(atob(str.replace(/-/g, "+").replace(/_/g, "/"))));
+  } catch (_unused4) {
     return "";
   }
 }
 function extractBody(payload) {
   var _payload$body, _payload$body2;
   if (!payload) return "";
-  // Try plain text first
   if (payload.mimeType === "text/plain" && (_payload$body = payload.body) !== null && _payload$body !== void 0 && _payload$body.data) return b64decode(payload.body.data);
-  // Multipart
   if (payload.parts) {
     var _iterator = _createForOfIteratorHelper(payload.parts),
       _step;
     try {
       for (_iterator.s(); !(_step = _iterator.n()).done;) {
-        var _part$body;
-        var part = _step.value;
-        if (part.mimeType === "text/plain" && (_part$body = part.body) !== null && _part$body !== void 0 && _part$body.data) return b64decode(part.body.data);
+        var _p$body;
+        var p = _step.value;
+        if (p.mimeType === "text/plain" && (_p$body = p.body) !== null && _p$body !== void 0 && _p$body.data) return b64decode(p.body.data);
       }
     } catch (err) {
       _iterator.e(err);
@@ -537,9 +583,9 @@ function extractBody(payload) {
       _step2;
     try {
       for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-        var _part = _step2.value;
-        var nested = extractBody(_part);
-        if (nested) return nested;
+        var _p = _step2.value;
+        var n = extractBody(_p);
+        if (n) return n;
       }
     } catch (err) {
       _iterator2.e(err);
@@ -550,87 +596,91 @@ function extractBody(payload) {
   if ((_payload$body2 = payload.body) !== null && _payload$body2 !== void 0 && _payload$body2.data) return b64decode(payload.body.data);
   return "";
 }
-function fetchJobEmailsFromGmail(_x13) {
+function fetchJobEmailsFromGmail(_x14) {
   return _fetchJobEmailsFromGmail.apply(this, arguments);
 } // ─── YC Jobs ──────────────────────────────────────────────────────────────────
 function _fetchJobEmailsFromGmail() {
-  _fetchJobEmailsFromGmail = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10(token) {
-    var _listRes$messages;
-    var allSenders, senderQ, query, listRes, messages, grouped, _iterator4, _step4, _loop3, jobs, _i, _Object$entries, _Object$entries$_i, platformId, bodies, parsed, _iterator5, _step5, j, remote, loc, _t9, _t0;
+  _fetchJobEmailsFromGmail = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11(token) {
+    var _listRes$messages, _listRes$messages2;
+    var allSenders, senderQ, subjectQ, query, listRes, messages, grouped, _iterator4, _step4, _loop2, jobs, _i, _Object$entries, _Object$entries$_i, platformId, bodies, parsed, _iterator5, _step5, j, remote, loc, _t0, _t1;
     return _regenerator().w(function (_context13) {
       while (1) switch (_context13.p = _context13.n) {
         case 0:
+          // Build query from all known senders
           allSenders = PLATFORMS.filter(function (p) {
             return p.emailSource;
           }).flatMap(function (p) {
             return p.senders;
           });
-          // Broader query: search by platform names in subject too, catches re-branded senders
           senderQ = allSenders.map(function (s) {
             return "from:".concat(s);
-          }).join(" OR ");
-          var platformSubjects = "subject:(job OR jobs OR opening OR opportunity OR hiring OR alert OR recommendation) (linkedin OR naukri OR indeed OR instahyre OR hirist)";
-          query = encodeURIComponent("(" + senderQ + " OR " + platformSubjects + ") newer_than:14d"); // Extended to 14d, broader query
-          console.log("[JobHunt] Gmail query:", decodeURIComponent(query));
-          console.log("[JobHunt] Token being used:", token ? token.slice(0,20) + "..." : "NONE"); // List messages
+          }).join(" OR "); // Also search by platform names in subject as fallback
+          subjectQ = "subject:(job OR jobs OR opening OR alert OR recommendation) (linkedin OR naukri OR indeed OR instahyre OR hirist)";
+          query = "(".concat(senderQ, " OR ").concat(subjectQ, ") newer_than:14d");
+          console.log("[JobHunt] Gmail query:", query);
           _context13.n = 1;
-          return gmailFetch("/users/me/messages?q=".concat(query, "&maxResults=30"), token);
+          return gmailFetch("/users/me/messages?q=".concat(encodeURIComponent(query), "&maxResults=40"), token);
         case 1:
           listRes = _context13.v;
-          console.log("[JobHunt] Gmail list response:", JSON.stringify(listRes).slice(0, 500));
-          if ((_listRes$messages = listRes.messages) !== null && _listRes$messages !== void 0 && _listRes$messages.length) {
+          console.log("[JobHunt] Gmail list result:", ((_listRes$messages = listRes.messages) === null || _listRes$messages === void 0 ? void 0 : _listRes$messages.length) || 0, "messages, error:", listRes.error || "none");
+          if ((_listRes$messages2 = listRes.messages) !== null && _listRes$messages2 !== void 0 && _listRes$messages2.length) {
             _context13.n = 2;
             break;
           }
-          console.log("[JobHunt] No messages found. Error:", listRes.error);
           return _context13.a(2, []);
         case 2:
           _context13.n = 3;
           return Promise.all(listRes.messages.map(function (m) {
-            return gmailFetch("/users/me/messages/".concat(m.id, "?format=full"), token).catch(function () {
+            return gmailFetch("/users/me/messages/".concat(m.id, "?format=full"), token)["catch"](function (e) {
+              console.warn("fetch msg failed", e);
               return null;
             });
           }));
         case 3:
           messages = _context13.v;
-          console.log("[JobHunt] Fetched", messages.filter(Boolean).length, "messages");
-          messages.filter(Boolean).forEach(function(m, i) {
-            var fromH = m.payload && m.payload.headers && m.payload.headers.find(function(h){ return h.name.toLowerCase() === "from"; });
-            var subH = m.payload && m.payload.headers && m.payload.headers.find(function(h){ return h.name.toLowerCase() === "subject"; });
-            console.log("[JobHunt] Email", i+1, "| From:", fromH ? fromH.value : "?", "| Subject:", subH ? subH.value : "?");
+          // Log every email for debugging
+          messages.filter(Boolean).forEach(function (m, i) {
+            var _m$payload, _m$payload2;
+            var from = ((_m$payload = m.payload) === null || _m$payload === void 0 || (_m$payload = _m$payload.headers) === null || _m$payload === void 0 || (_m$payload = _m$payload.find(function (h) {
+              return h.name.toLowerCase() === "from";
+            })) === null || _m$payload === void 0 ? void 0 : _m$payload.value) || "?";
+            var subj = ((_m$payload2 = m.payload) === null || _m$payload2 === void 0 || (_m$payload2 = _m$payload2.headers) === null || _m$payload2 === void 0 || (_m$payload2 = _m$payload2.find(function (h) {
+              return h.name.toLowerCase() === "subject";
+            })) === null || _m$payload2 === void 0 ? void 0 : _m$payload2.value) || "?";
+            console.log("[JobHunt] Email ".concat(i + 1, ": FROM=\"").concat(from, "\" SUBJECT=\"").concat(subj, "\""));
           });
+
           // Group by platform
           grouped = {};
           _iterator4 = _createForOfIteratorHelper(messages.filter(Boolean));
           _context13.p = 4;
-          _loop3 = /*#__PURE__*/_regenerator().m(function _loop3() {
+          _loop2 = /*#__PURE__*/_regenerator().m(function _loop2() {
             var _msg$payload, _msg$payload2;
-            var msg, fromHeader, subjectHeader, body, from, platform;
+            var msg, fromH, subjH, fromLow, subjLow, body, platform;
             return _regenerator().w(function (_context12) {
               while (1) switch (_context12.n) {
                 case 0:
                   msg = _step4.value;
-                  fromHeader = ((_msg$payload = msg.payload) === null || _msg$payload === void 0 || (_msg$payload = _msg$payload.headers) === null || _msg$payload === void 0 || (_msg$payload = _msg$payload.find(function (h) {
+                  fromH = ((_msg$payload = msg.payload) === null || _msg$payload === void 0 || (_msg$payload = _msg$payload.headers) === null || _msg$payload === void 0 || (_msg$payload = _msg$payload.find(function (h) {
                     return h.name.toLowerCase() === "from";
                   })) === null || _msg$payload === void 0 ? void 0 : _msg$payload.value) || "";
-                  subjectHeader = ((_msg$payload2 = msg.payload) === null || _msg$payload2 === void 0 || (_msg$payload2 = _msg$payload2.headers) === null || _msg$payload2 === void 0 || (_msg$payload2 = _msg$payload2.find(function (h) {
+                  subjH = ((_msg$payload2 = msg.payload) === null || _msg$payload2 === void 0 || (_msg$payload2 = _msg$payload2.headers) === null || _msg$payload2 === void 0 || (_msg$payload2 = _msg$payload2.find(function (h) {
                     return h.name.toLowerCase() === "subject";
                   })) === null || _msg$payload2 === void 0 ? void 0 : _msg$payload2.value) || "";
+                  fromLow = fromH.toLowerCase();
+                  subjLow = subjH.toLowerCase();
                   body = extractBody(msg.payload);
-                  from = fromHeader.toLowerCase();
                   platform = PLATFORMS.find(function (p) {
-                    var _p$senders;
-                    // Match by sender address OR by platform name in from/subject
-                    var senderMatch = p.emailSource && ((_p$senders = p.senders) === null || _p$senders === void 0 ? void 0 : _p$senders.some(function (s) {
-                      var domain = s.split("@")[1] || "";
-                      return from.includes(domain) || from.includes(s);
-                    }));
-                    if (senderMatch) return true;
-                    // Fallback: match platform name in subject
-                    var subjectLower = subjectHeader.toLowerCase();
-                    return p.emailSource && subjectLower.includes(p.id);
+                    if (!p.emailSource) return false;
+                    // Match by any sender string appearing in the from header
+                    if (p.senders.some(function (s) {
+                      return fromLow.includes(s.toLowerCase());
+                    })) return true;
+                    // Fallback: platform id appears in subject
+                    if (subjLow.includes(p.id)) return true;
+                    return false;
                   });
-                  console.log("[JobHunt] Email from:", fromHeader, "-> platform:", platform ? platform.id : "none");
+                  console.log("[JobHunt] \"".concat(fromH, "\" -> platform: ").concat((platform === null || platform === void 0 ? void 0 : platform.id) || "NO MATCH"));
                   if (platform) {
                     _context12.n = 1;
                     break;
@@ -638,11 +688,11 @@ function _fetchJobEmailsFromGmail() {
                   return _context12.a(2, 1);
                 case 1:
                   if (!grouped[platform.id]) grouped[platform.id] = [];
-                  grouped[platform.id].push("SUBJECT: ".concat(subjectHeader, "\n").concat(body));
+                  grouped[platform.id].push("SUBJECT: ".concat(subjH, "\n").concat(body));
                 case 2:
                   return _context12.a(2);
               }
-            }, _loop3);
+            }, _loop2);
           });
           _iterator4.s();
         case 5:
@@ -650,7 +700,7 @@ function _fetchJobEmailsFromGmail() {
             _context13.n = 8;
             break;
           }
-          return _context13.d(_regeneratorValues(_loop3()), 6);
+          return _context13.d(_regeneratorValues(_loop2()), 6);
         case 6:
           if (!_context13.v) {
             _context13.n = 7;
@@ -665,14 +715,14 @@ function _fetchJobEmailsFromGmail() {
           break;
         case 9:
           _context13.p = 9;
-          _t9 = _context13.v;
-          _iterator4.e(_t9);
+          _t0 = _context13.v;
+          _iterator4.e(_t0);
         case 10:
           _context13.p = 10;
           _iterator4.f();
           return _context13.f(10);
         case 11:
-          // Parse jobs per platform with Gemini
+          console.log("[JobHunt] Grouped platforms:", Object.keys(grouped));
           jobs = [];
           _i = 0, _Object$entries = Object.entries(grouped);
         case 12:
@@ -685,6 +735,7 @@ function _fetchJobEmailsFromGmail() {
           return parseEmailJobs(bodies.join("\n\n---\n\n"), platformId);
         case 13:
           parsed = _context13.v;
+          console.log("[JobHunt] Parsed ".concat(parsed.length, " jobs from ").concat(platformId));
           _iterator5 = _createForOfIteratorHelper(parsed);
           _context13.p = 14;
           _iterator5.s();
@@ -727,8 +778,8 @@ function _fetchJobEmailsFromGmail() {
           break;
         case 19:
           _context13.p = 19;
-          _t0 = _context13.v;
-          _iterator5.e(_t0);
+          _t1 = _context13.v;
+          _iterator5.e(_t1);
         case 20:
           _context13.p = 20;
           _iterator5.f();
@@ -738,9 +789,10 @@ function _fetchJobEmailsFromGmail() {
           _context13.n = 12;
           break;
         case 22:
+          console.log("[JobHunt] Total email jobs:", jobs.length);
           return _context13.a(2, jobs);
       }
-    }, _callee10, null, [[14, 19, 20, 21], [4, 9, 10, 11]]);
+    }, _callee11, null, [[14, 19, 20, 21], [4, 9, 10, 11]]);
   }));
   return _fetchJobEmailsFromGmail.apply(this, arguments);
 }
@@ -748,8 +800,8 @@ function fetchYCJobs() {
   return _fetchYCJobs.apply(this, arguments);
 }
 function _fetchYCJobs() {
-  _fetchYCJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11() {
-    var u, stories, thread, comments, _t1;
+  _fetchYCJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee12() {
+    var u, stories, thread, comments, _t10;
     return _regenerator().w(function (_context14) {
       while (1) switch (_context14.p = _context14.n) {
         case 0:
@@ -782,7 +834,7 @@ function _fetchYCJobs() {
           return Promise.all((thread.kids || []).slice(0, 60).map(function (id) {
             return fetch("https://hacker-news.firebaseio.com/v0/item/".concat(id, ".json")).then(function (r) {
               return r.json();
-            }).catch(function () {
+            })["catch"](function () {
               return null;
             });
           }));
@@ -818,15 +870,14 @@ function _fetchYCJobs() {
           }));
         case 5:
           _context14.p = 5;
-          _t1 = _context14.v;
+          _t10 = _context14.v;
           return _context14.a(2, []);
       }
-    }, _callee11, null, [[0, 5]]);
+    }, _callee12, null, [[0, 5]]);
   }));
   return _fetchYCJobs.apply(this, arguments);
 }
-function detectCountry(text) {
-  var t = text.toLowerCase();
+function detectCountry(t) {
   if (/\busa?\b|united states|san francisco|new york|seattle/i.test(t)) return "🇺🇸 USA";
   if (/\buk\b|united kingdom|london/i.test(t)) return "🇬🇧 UK";
   if (/\bindia\b|bangalore|bengaluru|mumbai|delhi|hyderabad/i.test(t)) return "🇮🇳 India";
@@ -850,8 +901,8 @@ function generateMockJobs(platform) {
   return Array.from({
     length: 8
   }, function (_, i) {
-    var loc = locs[i % locs.length];
-    var remote = loc === "Remote";
+    var loc = locs[i % locs.length],
+      remote = loc === "Remote";
     return {
       id: "".concat(platform, "_mock_").concat(i),
       platform: platform,
@@ -873,8 +924,7 @@ function generateMockJobs(platform) {
 }
 function platformUrl(platform, title, company) {
   var t = title || "senior software engineer";
-  var q = encodeURIComponent(company ? t + " " + company : t);
-  var qBlr = encodeURIComponent((company ? t + " " + company : t) + " Bengaluru OR remote");
+  var q = encodeURIComponent(company ? "".concat(t, " ").concat(company) : t);
   return {
     linkedin: "https://www.linkedin.com/jobs/search/?keywords=".concat(q, "&location=Bengaluru&f_WT=2%2C1&f_TPR=r604800"),
     indeed: "https://in.indeed.com/jobs?q=".concat(q, "&l=Bengaluru&fromage=14"),
@@ -884,7 +934,7 @@ function platformUrl(platform, title, company) {
   }[platform] || "#";
 }
 
-// ─── UI Atoms ─────────────────────────────────────────────────────────────────
+// ─── UI atoms ─────────────────────────────────────────────────────────────────
 function ScoreBadge(_ref) {
   var score = _ref.score,
     loading = _ref.loading;
@@ -894,8 +944,7 @@ function ScoreBadge(_ref) {
       padding: "2px 8px",
       borderRadius: 20,
       background: "#1e293b",
-      color: "#94a3b8",
-      fontFamily: "monospace"
+      color: "#94a3b8"
     }
   }, "scoring\u2026");
   if (score === null) return /*#__PURE__*/React.createElement("span", {
@@ -904,8 +953,7 @@ function ScoreBadge(_ref) {
       padding: "2px 8px",
       borderRadius: 20,
       background: "#1e293b",
-      color: "#64748b",
-      fontFamily: "monospace"
+      color: "#64748b"
     }
   }, "\u2013");
   var c = score >= 75 ? "#22c55e" : score >= 50 ? "#f59e0b" : "#ef4444";
@@ -917,16 +965,12 @@ function ScoreBadge(_ref) {
       borderRadius: 20,
       background: c + "22",
       color: c,
-      border: "1px solid ".concat(c, "44"),
-      fontFamily: "monospace"
+      border: "1px solid ".concat(c, "44")
     }
   }, score, "%");
 }
 function SourceBadge(_ref2) {
   var source = _ref2.source;
-  if (source === "mock") return /*#__PURE__*/React.createElement("span", {
-    style: { fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "#78350f22", color: "#f59e0b", border: "1px solid #78350f44", fontWeight: 700 }
-  }, "SAMPLE");
   if (source === "email") return /*#__PURE__*/React.createElement("span", {
     style: {
       fontSize: 9,
@@ -949,12 +993,61 @@ function SourceBadge(_ref2) {
       fontWeight: 700
     }
   }, "LIVE");
+  if (source === "mock") return /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 9,
+      padding: "1px 5px",
+      borderRadius: 3,
+      background: "#78350f22",
+      color: "#f59e0b",
+      border: "1px solid #78350f44",
+      fontWeight: 700
+    }
+  }, "SAMPLE");
   return null;
+}
+
+// ─── Sec and F components — defined at top level to avoid focus loss ──────────
+function Sec(_ref3) {
+  var title = _ref3.title,
+    children = _ref3.children;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "#0a1628",
+      border: "1px solid #1e293b",
+      borderRadius: 10,
+      padding: "20px",
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Syne',sans-serif",
+      fontWeight: 700,
+      fontSize: 14,
+      marginBottom: 16,
+      color: "#60a5fa"
+    }
+  }, title), children);
+}
+function F(_ref4) {
+  var label = _ref4.label,
+    props = _objectWithoutProperties(_ref4, _excluded);
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "sl"
+  }, label), props.rows ? /*#__PURE__*/React.createElement("textarea", _extends({}, props, {
+    style: {
+      resize: "vertical",
+      minHeight: props.rows * 22
+    }
+  })) : /*#__PURE__*/React.createElement("input", props));
 }
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 function App() {
-  var _gmailUser$email;
   var _useState = useState("jobs"),
     _useState2 = _slicedToArray(_useState, 2),
     tab = _useState2[0],
@@ -1017,10 +1110,6 @@ function App() {
     _useState28 = _slicedToArray(_useState27, 2),
     gmailUser = _useState28[0],
     setGmailUser = _useState28[1];
-  var _useState29 = useState(false),
-    _useState30 = _slicedToArray(_useState29, 2),
-    gmailReady = _useState30[0],
-    setGmailReady = _useState30[1];
   function showToast(msg) {
     var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "success";
     setToast({
@@ -1029,49 +1118,36 @@ function App() {
     });
     setTimeout(function () {
       return setToast(null);
-    }, 3500);
+    }, 4000);
   }
 
-  // Init Google Auth
+  // ── Auth — no token caching, always fresh ──────────────────────────────────
   useEffect(function () {
-    initGoogleAuth(function (token) {
-      setGmailReady(true);
-      // Try to get user info
-      fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-        headers: {
-          Authorization: "Bearer ".concat(token)
-        }
-      }).then(function (r) {
-        return r.ok ? r.json() : Promise.reject(r.status);
-      }).then(function (u) {
-        if (u && !u.error) setGmailUser(u);
-      }).catch(function (e) { console.log('[JobHunt] userinfo error:', e); });
+    initGoogleAuth(function (user, token) {
+      currentAccessToken = token;
+      setGmailUser(user);
     });
-    // Check for existing valid token
-    var stored = getStoredToken();
-    if (stored) {
-      setGmailReady(true);
-      fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-        headers: {
-          Authorization: "Bearer ".concat(stored)
-        }
-      }).then(function (r) {
-        return r.ok ? r.json() : Promise.reject('HTTP ' + r.status);
-      }).then(function (u) {
-        if (u && !u.error) { setGmailUser(u); } else { throw new Error(u.error || 'bad response'); }
-      }).catch(function (e) {
-        console.log('[JobHunt] Stored token expired/invalid:', e);
-        ls.set(GTOKEN_KEY, null);
-        setGmailReady(false);
-      });
-    }
   }, []);
+  function handleSignIn() {
+    if (!tokenClient) {
+      showToast("Google auth loading, try again", "error");
+      return;
+    }
+    tokenClient.requestAccessToken({
+      prompt: "select_account"
+    });
+  }
+  function handleSignOut() {
+    currentAccessToken = null;
+    setGmailUser(null);
+    showToast("Signed out of Google");
+  }
 
-  // Load board jobs
-  var loadBoardJobs = useCallback(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-    var all, _iterator3, _step3, _loop, _t, _t2, _t3, _t4;
+  // ── Load board jobs ────────────────────────────────────────────────────────
+  var loadBoardJobs = useCallback(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
+    var all, _iterator3, _step3, p, _t2, _t3, _t4;
     return _regenerator().w(function (_context2) {
-      while (1) switch (_context2.p = _context2.n) {
+      while (1) switch (_context2.n) {
         case 0:
           setLoading(true);
           all = [];
@@ -1079,82 +1155,44 @@ function App() {
             _context2.n = 2;
             break;
           }
-          _t = [];
-          _t2 = _toConsumableArray(all);
-          _t3 = _toConsumableArray;
+          _t2 = [];
+          _t3 = _toConsumableArray(all);
+          _t4 = _toConsumableArray;
           _context2.n = 1;
           return fetchYCJobs();
         case 1:
-          all = _t.concat.call(_t, _t2, _t3(_context2.v));
+          all = _t2.concat.call(_t2, _t3, _t4(_context2.v));
         case 2:
           _iterator3 = _createForOfIteratorHelper(PLATFORMS.filter(function (p) {
             return p.id !== "yc";
           }));
-          _context2.p = 3;
-          _loop = /*#__PURE__*/_regenerator().m(function _loop() {
-            var p;
-            return _regenerator().w(function (_context) {
-              while (1) switch (_context.n) {
-                case 0:
-                  p = _step3.value;
-                  if (selPlatforms.includes(p.id)) {
-                    _context.n = 1;
-                    break;
-                  }
-                  return _context.a(2, 1);
-                case 1:
-                  // Always add mock jobs for non-API platforms (email jobs are additive on top)
-                  all = [].concat(_toConsumableArray(all), _toConsumableArray(generateMockJobs(p.id)));
-                case 2:
-                  return _context.a(2);
-              }
-            }, _loop);
-          });
-          _iterator3.s();
-        case 4:
-          if ((_step3 = _iterator3.n()).done) {
-            _context2.n = 7;
-            break;
+          try {
+            for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+              p = _step3.value;
+              if (selPlatforms.includes(p.id)) all = [].concat(_toConsumableArray(all), _toConsumableArray(generateMockJobs(p.id)));
+            }
+          } catch (err) {
+            _iterator3.e(err);
+          } finally {
+            _iterator3.f();
           }
-          return _context2.d(_regeneratorValues(_loop()), 5);
-        case 5:
-          if (!_context2.v) {
-            _context2.n = 6;
-            break;
-          }
-          return _context2.a(3, 6);
-        case 6:
-          _context2.n = 4;
-          break;
-        case 7:
-          _context2.n = 9;
-          break;
-        case 8:
-          _context2.p = 8;
-          _t4 = _context2.v;
-          _iterator3.e(_t4);
-        case 9:
-          _context2.p = 9;
-          _iterator3.f();
-          return _context2.f(9);
-        case 10:
           all = all.filter(function (j) {
             return j.remote || /bengaluru|bangalore/i.test(j.location);
           });
           setJobs(all);
           setLoading(false);
-          scoreAllJobs(all);
-        case 11:
+          scoreJobs(all);
+        case 3:
           return _context2.a(2);
       }
-    }, _callee, null, [[3, 8, 9, 10]]);
-  })), [selPlatforms, emailJobs]);
-  function scoreAllJobs(_x14) {
-    return _scoreAllJobs.apply(this, arguments);
+    }, _callee2);
+  })), [selPlatforms]);
+  function scoreJobs(_x15) {
+    return _scoreJobs.apply(this, arguments);
   }
-  function _scoreAllJobs() {
-    _scoreAllJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2(jobList) {
-      var batch, _loop2, i;
+  function _scoreJobs() {
+    _scoreJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3(list) {
+      var _loop, i;
       return _regenerator().w(function (_context4) {
         while (1) switch (_context4.n) {
           case 0:
@@ -1164,14 +1202,13 @@ function App() {
             }
             return _context4.a(2);
           case 1:
-            batch = jobList.slice(0, 24);
-            _loop2 = /*#__PURE__*/_regenerator().m(function _loop2() {
-              var chunk, upLoad, results, applyRes;
+            _loop = /*#__PURE__*/_regenerator().m(function _loop() {
+              var chunk, upd, results, apply;
               return _regenerator().w(function (_context3) {
                 while (1) switch (_context3.n) {
                   case 0:
-                    chunk = batch.slice(i, i + 3);
-                    upLoad = function upLoad(arr) {
+                    chunk = list.slice(i, i + 3);
+                    upd = function upd(arr) {
                       return arr.map(function (j) {
                         return chunk.find(function (c) {
                           return c.id === j.id;
@@ -1181,10 +1218,10 @@ function App() {
                       });
                     };
                     setJobs(function (p) {
-                      return upLoad(p);
+                      return upd(p);
                     });
                     setEmailJobs(function (p) {
-                      return upLoad(p);
+                      return upd(p);
                     });
                     _context3.n = 1;
                     return Promise.all(chunk.map(function (j) {
@@ -1192,7 +1229,7 @@ function App() {
                     }));
                   case 1:
                     results = _context3.v;
-                    applyRes = function applyRes(arr) {
+                    apply = function apply(arr) {
                       return arr.map(function (j) {
                         var idx = chunk.findIndex(function (c) {
                           return c.id === j.id;
@@ -1206,23 +1243,23 @@ function App() {
                       });
                     };
                     setJobs(function (p) {
-                      return applyRes(p);
+                      return apply(p);
                     });
                     setEmailJobs(function (p) {
-                      return applyRes(p);
+                      return apply(p);
                     });
                   case 2:
                     return _context3.a(2);
                 }
-              }, _loop2);
+              }, _loop);
             });
             i = 0;
           case 2:
-            if (!(i < batch.length)) {
+            if (!(i < Math.min(list.length, 24))) {
               _context4.n = 4;
               break;
             }
-            return _context4.d(_regeneratorValues(_loop2()), 3);
+            return _context4.d(_regeneratorValues(_loop()), 3);
           case 3:
             i += 3;
             _context4.n = 2;
@@ -1230,49 +1267,49 @@ function App() {
           case 4:
             return _context4.a(2);
         }
-      }, _callee2);
+      }, _callee3);
     }));
-    return _scoreAllJobs.apply(this, arguments);
+    return _scoreJobs.apply(this, arguments);
   }
   useEffect(function () {
     loadBoardJobs();
   }, []);
 
-  // Gmail sync
+  // ── Gmail sync ─────────────────────────────────────────────────────────────
   function handleGmailSync() {
     return _handleGmailSync.apply(this, arguments);
   }
   function _handleGmailSync() {
-    _handleGmailSync = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
-      var token, fetched, merged, _t5;
+    _handleGmailSync = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4() {
+      var _tokenClient, fetched, merged, _t5;
       return _regenerator().w(function (_context5) {
         while (1) switch (_context5.p = _context5.n) {
           case 0:
-            // Always get a fresh token to avoid 401s
-            if (!tokenClient) {
-              showToast("Google Auth not ready yet, try again", "error");
-              return _context5.a(2);
-            }
-            token = getStoredToken();
-            if (token) {
+            if (currentAccessToken) {
               _context5.n = 1;
               break;
             }
-            // No valid token: request one — user will be prompted, then must tap Sync again
-            ls.set(GTOKEN_KEY, null);
-            tokenClient.requestAccessToken({prompt: ''});
-            showToast("Signing in\u2026 tap Sync again after Google prompt", "info");
+            if (!gmailUser) {
+              // Not signed in — trigger sign in, user must tap sync again after
+              handleSignIn();
+              showToast("Signing in… tap Sync again after Google prompt", "info");
+            } else {
+              // Was signed in but token gone — re-auth silently
+              showToast("Refreshing auth… tap Sync again in a moment", "info");
+              (_tokenClient = tokenClient) === null || _tokenClient === void 0 || _tokenClient.requestAccessToken({
+                prompt: ""
+              });
+            }
             return _context5.a(2);
           case 1:
             setFetchingEmail(true);
-            _context5.p = 3;
-            _context5.n = 4;
-            return fetchJobEmailsFromGmail(token);
-          case 4:
+            _context5.p = 2;
+            _context5.n = 3;
+            return fetchJobEmailsFromGmail(currentAccessToken);
+          case 3:
             fetched = _context5.v;
             if (!fetched.length) {
-              showToast("No job alert emails found — check console for debug info", "info");
-              console.log("[JobHunt] No emails matched. Check: 1) Gmail has job alert emails 2) They are newer than 14 days 3) Check the query logged above");
+              showToast("No job emails matched — check console (F12) for details", "info");
             } else {
               showToast("Found ".concat(fetched.length, " job").concat(fetched.length > 1 ? "s" : "", " from your emails! \uD83D\uDCE7"));
             }
@@ -1283,37 +1320,28 @@ function App() {
             }))).slice(0, 100);
             setEmailJobs(merged);
             ls.set(EMAIL_JOBS_KEY, merged);
-            scoreAllJobs(fetched);
-            _context5.n = 6;
+            scoreJobs(fetched);
+            _context5.n = 5;
             break;
-          case 5:
-            _context5.p = 5;
+          case 4:
+            _context5.p = 4;
             _t5 = _context5.v;
-            if (_t5.message === "Token expired" || (_t5.message && (_t5.message.includes("401") || _t5.message.includes("invalid_request") || _t5.message.includes("Invalid Credentials")))) {
-              ls.set(GTOKEN_KEY, null);
-              setGmailReady(false);
+            console.error("[JobHunt] Sync error:", _t5);
+            if (_t5.message.includes("Token expired") || _t5.message.includes("401") || _t5.message.includes("sign in")) {
+              currentAccessToken = null;
               setGmailUser(null);
-              showToast("Session expired \u2014 please sign in with Google again", "error");
+              showToast("Session expired — please sign in again", "error");
             } else {
-              showToast("Email sync failed: " + _t5.message, "error");
-              console.error("[JobHunt] Sync error:", _t5);
+              showToast("Sync failed: " + _t5.message, "error");
             }
-          case 6:
+          case 5:
             setFetchingEmail(false);
-          case 7:
+          case 6:
             return _context5.a(2);
         }
-      }, _callee3, null, [[3, 5]]);
+      }, _callee4, null, [[2, 4]]);
     }));
     return _handleGmailSync.apply(this, arguments);
-  }
-  function handleSignOut() {
-    var _window$google2;
-    ls.set(GTOKEN_KEY, null);
-    setGmailUser(null);
-    setGmailReady(false);
-    if ((_window$google2 = window.google) !== null && _window$google2 !== void 0 && (_window$google2 = _window$google2.accounts) !== null && _window$google2 !== void 0 && _window$google2.oauth2) window.google.accounts.oauth2.revoke(getStoredToken() || "", function () {});
-    showToast("Signed out of Google");
   }
   var allVisibleJobs = [].concat(_toConsumableArray(emailJobs), _toConsumableArray(jobs)).filter(function (j, i, arr) {
     return arr.findIndex(function (x) {
@@ -1336,15 +1364,17 @@ function App() {
     showToast("Profile saved!");
     setTab("jobs");
   }
-  function startApplyFlow(_x15) {
+
+  // ── Apply flow ─────────────────────────────────────────────────────────────
+  function startApplyFlow(_x16) {
     return _startApplyFlow.apply(this, arguments);
   }
   function _startApplyFlow() {
-    _startApplyFlow = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(job) {
+    _startApplyFlow = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(job) {
       var _PLATFORMS$find;
-      var hasCL, _yield$Promise$all, _yield$Promise$all2, cv, cl, missing, saved;
+      var hasCL, _yield$Promise$all, _yield$Promise$all2, cv, cl, missing, saved, _t6;
       return _regenerator().w(function (_context6) {
-        while (1) switch (_context6.n) {
+        while (1) switch (_context6.p = _context6.n) {
           case 0:
             hasCL = (_PLATFORMS$find = PLATFORMS.find(function (p) {
               return p.id === job.platform;
@@ -1359,19 +1389,25 @@ function App() {
               activeDoc: "cv"
             });
             _context6.p = 1;
-            _context6.n = 1;
-            return Promise.all([generateCuratedCV(job, profile).catch(function(e){ return "Error generating CV: " + e.message; }), hasCL ? generateCoverLetter(job, profile).catch(function(e){ return "Error generating cover letter: " + e.message; }) : Promise.resolve(null), detectMissingFields(job, profile, loadExtraAnswers()).catch(function(){ return []; })]);
-          case 1:
+            _context6.n = 2;
+            return Promise.all([generateCuratedCV(job, profile)["catch"](function (e) {
+              return "Error: ".concat(e.message);
+            }), hasCL ? generateCoverLetter(job, profile)["catch"](function (e) {
+              return "Error: ".concat(e.message);
+            }) : Promise.resolve(null), detectMissingFields(job, profile, loadExtraAnswers())["catch"](function () {
+              return [];
+            })]);
+          case 2:
             _yield$Promise$all = _context6.v;
             _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 3);
             cv = _yield$Promise$all2[0];
             cl = _yield$Promise$all2[1];
-            missing = _yield$Promise$all2[2] || [];
+            missing = _yield$Promise$all2[2];
             saved = loadExtraAnswers();
             setApplyFlow(function (prev) {
               return _objectSpread(_objectSpread({}, prev), {}, {
                 stage: "review",
-                cv: cv || "(Profile is empty — please fill your profile first, then try again.)",
+                cv: cv,
                 coverLetter: cl,
                 missingFields: missing.filter(function (f) {
                   return !saved[f.field];
@@ -1379,45 +1415,44 @@ function App() {
                 extraAnswers: saved
               });
             });
-            _context6.n = 3;
+            _context6.n = 4;
             break;
-          case 2:
-            _context6.p = 2;
+          case 3:
+            _context6.p = 3;
+            _t6 = _context6.v;
             setApplyFlow(function (prev) {
               return _objectSpread(_objectSpread({}, prev), {}, {
                 stage: "review",
-                cv: "Error preparing application. Please check your Gemini API key and try again.",
+                cv: "Could not generate CV. Check your Gemini API key and profile.",
                 coverLetter: null,
                 missingFields: [],
                 extraAnswers: {}
               });
             });
-          case 3:
+          case 4:
             return _context6.a(2);
         }
-      }, _callee4);
+      }, _callee5, null, [[1, 3]]);
     }));
     return _startApplyFlow.apply(this, arguments);
   }
   function handleApproveDocuments() {
-    if (applyFlow.missingFields.length > 0) setApplyFlow(function (prev) {
-      return _objectSpread(_objectSpread({}, prev), {}, {
+    if (applyFlow.missingFields.length > 0) setApplyFlow(function (p) {
+      return _objectSpread(_objectSpread({}, p), {}, {
         stage: "missing_fields"
       });
     });else executeApply();
   }
   function handleMissingAnswersSubmit(answers) {
-    var merged = _objectSpread(_objectSpread({}, loadExtraAnswers()), answers);
-    saveExtraAnswers(merged);
-    executeApply(merged);
+    saveExtraAnswers(_objectSpread(_objectSpread({}, loadExtraAnswers()), answers));
+    executeApply();
   }
   function executeApply() {
-    var job = applyFlow.job;
-    markApplied(job.id);
+    markApplied(applyFlow.job.id);
     setApplied(loadApplied());
-    window.open(job.url, "_blank");
+    window.open(applyFlow.job.url, "_blank");
     setApplyFlow(null);
-    showToast("Opened ".concat(job.company, " \u2014 form ready to fill!"));
+    showToast("Opened ".concat(applyFlow.job.company, " \u2014 paste your docs to apply!"));
   }
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1426,57 +1461,170 @@ function App() {
       color: "#e2e8f0",
       fontFamily: "'DM Mono','Fira Code',monospace"
     }
-  }, /*#__PURE__*/React.createElement("style", null, "\n@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');\n*{box-sizing:border-box;margin:0;padding:0;}\n::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0a1628}::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:3px}\n.jcard{transition:all 0.2s;border:1px solid #1e293b;}\n.jcard:active{transform:scale(0.99);}\n@media(hover:hover){.jcard:hover{border-color:#334155;transform:translateY(-2px);box-shadow:0 8px 32px #00000088;}}\n.tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;}\n.btn{cursor:pointer;border:none;font-family:inherit;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}\n.btn:active{opacity:0.7;} .btn:disabled{opacity:0.4;cursor:not-allowed;}\ninput,textarea,select{background:#0a1628;border:1px solid #1e293b;color:#e2e8f0;font-family:inherit;font-size:16px;padding:10px 12px;border-radius:8px;width:100%;outline:none;-webkit-appearance:none;}\ninput:focus,textarea:focus,select:focus{border-color:#3b82f6;}\n.pill{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid;transition:all 0.15s;user-select:none;-webkit-tap-highlight-color:transparent;}\n.overlay{position:fixed;inset:0;background:#00000099;z-index:100;display:flex;align-items:flex-end;justify-content:center;padding:0;}\n@media(min-width:600px){.overlay{align-items:center;padding:20px;}}\n.modal{background:#0d1f38;border:1px solid #1e3a5f;border-radius:16px 16px 0 0;width:100%;max-height:92vh;overflow:auto;padding:20px 16px;padding-bottom:32px;}\n@media(min-width:600px){.modal{border-radius:12px;max-width:760px;padding:28px;}}\n.dtab{padding:8px 16px;border-radius:8px 8px 0 0;font-size:13px;cursor:pointer;border:1px solid;font-family:inherit;}\n.dtab.on{background:#061122;border-color:#1e3a5f;border-bottom-color:#061122;color:#e2e8f0;}\n.dtab.off{background:transparent;border-color:transparent;color:#475569;}\n.slider{-webkit-appearance:none;height:4px;border-radius:2px;background:linear-gradient(to right,#3b82f6 0%,#3b82f6 var(--val,0%),#1e293b var(--val,0%),#1e293b 100%);}\n.slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#3b82f6;cursor:pointer;}\n@keyframes spin{to{transform:rotate(360deg)}}\n@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}\n@keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}\n.fade{animation:fadeIn 0.3s ease;} .modal{animation:slideUp 0.25s ease;}\n.spin{animation:spin 1s linear infinite;display:inline-block;}\n.sl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#475569;margin-bottom:6px;}\n.applied-badge{font-size:9px;padding:2px 6px;border-radius:3px;background:#16532d22;color:#4ade80;border:1px solid #16532d44;font-weight:700;}\n.google-btn{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;border:1px solid #1e293b;background:#0a1628;color:#e2e8f0;cursor:pointer;font-family:inherit;font-size:13px;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}\n.google-btn:active{background:#0f1f33;}\n.nav-tab{padding:6px 14px;border-radius:8px;font-size:13px;font-family:inherit;transition:all 0.15s;cursor:pointer;border:1px solid;-webkit-tap-highlight-color:transparent;}\n.section-tab{padding:8px 14px;border-radius:20px;font-size:12px;font-family:inherit;cursor:pointer;border:1px solid;-webkit-tap-highlight-color:transparent;}\n"), /*#__PURE__*/React.createElement("div", {
-    style: { borderBottom: "1px solid #1e293b", background: "#040d1a", position: "sticky", top: 0, zIndex: 50 }
-  },
-  React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, padding: "0 14px", height: 52 } },
-    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 } },
-      React.createElement("div", { style: { width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg,#3b82f6,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 } }, "\u26A1"),
-      React.createElement("span", { style: { fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 19, letterSpacing: "-0.02em", whiteSpace: "nowrap" } },
-        "JobHunt", React.createElement("span", { style: { color: "#3b82f6" } }, "."), "ai"
-      ),
-      React.createElement("span", { style: { fontSize: 9, padding: "2px 5px", borderRadius: 4, background: "#1a1a2e", border: "1px solid #4285f422", color: "#7ba7f7", marginLeft: 2, flexShrink: 0 } }, "\u2726 Gemini")
-    ),
-    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, flexShrink: 0 } },
-      ["jobs", "profile"].map(function(t) {
-        return React.createElement("button", {
-          key: t, className: "btn",
-          onClick: function() { return setTab(t); },
-          style: { padding: "6px 12px", borderRadius: 8, fontSize: 13, fontFamily: "inherit", background: tab === t ? "#1e3a5f" : "transparent", color: tab === t ? "#60a5fa" : "#64748b", border: "1px solid " + (tab === t ? "#2563eb44" : "transparent") }
-        }, t === "jobs" ? "\uD83D\uDD0D" : "\uD83D\uDC64");
-      }),
-      React.createElement("div", { style: { width: 7, height: 7, borderRadius: 4, background: profile.name ? "#22c55e" : "#ef4444" } })
-    )
-  ),
-  React.createElement("div", { style: { padding: "0 14px 10px" } },
-    gmailUser
-      ? React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
-          React.createElement("button", {
-            className: "google-btn", onClick: handleGmailSync, disabled: fetchingEmail,
-            style: { flex: 1, justifyContent: "center" }
-          },
-            fetchingEmail ? React.createElement("span", { className: "spin" }, "\u27F3") : "\uD83D\uDCE7",
-            " ", fetchingEmail ? "Scanning\u2026" : "Sync Emails" + (emailJobs.length ? " (" + emailJobs.length + ")" : "")
-          ),
-          React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, padding: "7px 10px", borderRadius: 8, background: "#0a1e10", border: "1px solid #065f4644", flexShrink: 0 } },
-            gmailUser.picture && React.createElement("img", { src: gmailUser.picture, style: { width: 20, height: 20, borderRadius: 10 }, alt: "" }),
-            React.createElement("button", { className: "btn", onClick: handleSignOut, style: { fontSize: 13, color: "#475569", lineHeight: 1 } }, "\u2715")
-          )
-        )
-      : React.createElement("button", {
-          className: "google-btn",
-          onClick: function() { var _tc = tokenClient; return _tc ? _tc.requestAccessToken() : null; },
-          style: { width: "100%", justifyContent: "center" }
-        },
-          React.createElement("svg", { width: "16", height: "16", viewBox: "0 0 24 24", style: { flexShrink: 0 } },
-            React.createElement("path", { fill: "#4285F4", d: "M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" }),
-            React.createElement("path", { fill: "#34A853", d: "M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" }),
-            React.createElement("path", { fill: "#FBBC05", d: "M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" }),
-            React.createElement("path", { fill: "#EA4335", d: "M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" })
-          ),
-          "Sign in with Google to sync job emails"
-        )
-  )), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("style", null, "\n        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');\n        *{box-sizing:border-box;margin:0;padding:0;}\n        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0a1628}::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:3px}\n        .jcard{transition:all 0.2s;border:1px solid #1e293b;border-radius:10px;}\n        .jcard:active{transform:scale(0.99);}\n        .tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;}\n        .btn{cursor:pointer;border:none;font-family:inherit;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}\n        .btn:active{opacity:0.7;} .btn:disabled{opacity:0.4;cursor:not-allowed;}\n        input,textarea,select{background:#0a1628;border:1px solid #1e293b;color:#e2e8f0;font-family:inherit;font-size:16px;padding:10px 12px;border-radius:8px;width:100%;outline:none;-webkit-appearance:none;}\n        input:focus,textarea:focus,select:focus{border-color:#3b82f6;}\n        .pill{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid;user-select:none;-webkit-tap-highlight-color:transparent;}\n        .overlay{position:fixed;inset:0;background:#000000bb;z-index:100;display:flex;align-items:flex-end;justify-content:center;}\n        @media(min-width:600px){.overlay{align-items:center;padding:20px;}}\n        .modal{background:#0d1f38;border:1px solid #1e3a5f;border-radius:16px 16px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:20px 16px 40px;}\n        @media(min-width:600px){.modal{border-radius:12px;max-width:760px;padding:28px;}}\n        .dtab{padding:8px 16px;border-radius:8px 8px 0 0;font-size:13px;cursor:pointer;border:1px solid;font-family:inherit;}\n        .dtab.on{background:#061122;border-color:#1e3a5f;border-bottom-color:#061122;color:#e2e8f0;}\n        .dtab.off{background:transparent;border-color:transparent;color:#475569;}\n        .slider{-webkit-appearance:none;height:4px;border-radius:2px;background:linear-gradient(to right,#3b82f6 0%,#3b82f6 var(--val,0%),#1e293b var(--val,0%),#1e293b 100%);}\n        .slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#3b82f6;cursor:pointer;}\n        @keyframes spin{to{transform:rotate(360deg)}}\n        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}\n        @keyframes slideUp{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}\n        .fade{animation:fadeIn 0.25s ease;}\n        .modal{animation:slideUp 0.25s ease;}\n        .spin{animation:spin 1s linear infinite;display:inline-block;}\n        .sl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#475569;margin-bottom:6px;}\n        .applied-badge{font-size:9px;padding:2px 6px;border-radius:3px;background:#16532d22;color:#4ade80;border:1px solid #16532d44;font-weight:700;}\n        .google-btn{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;border:1px solid #1e293b;background:#0a1628;color:#e2e8f0;cursor:pointer;font-family:inherit;font-size:13px;-webkit-tap-highlight-color:transparent;}\n        .google-btn:active{background:#0f1f33;}\n      "), /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderBottom: "1px solid #1e293b",
+      background: "#040d1a",
+      position: "sticky",
+      top: 0,
+      zIndex: 50
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      padding: "0 14px",
+      height: 52
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      flex: 1,
+      minWidth: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 30,
+      height: 30,
+      borderRadius: 8,
+      background: "linear-gradient(135deg,#3b82f6,#8b5cf6)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: 16,
+      flexShrink: 0
+    }
+  }, "\u26A1"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Syne',sans-serif",
+      fontWeight: 800,
+      fontSize: 19,
+      letterSpacing: "-0.02em",
+      whiteSpace: "nowrap"
+    }
+  }, "JobHunt", /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#3b82f6"
+    }
+  }, "."), "ai"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 9,
+      padding: "2px 5px",
+      borderRadius: 4,
+      background: "#1a1a2e",
+      border: "1px solid #4285f422",
+      color: "#7ba7f7",
+      flexShrink: 0
+    }
+  }, "\u2726 Gemini")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      flexShrink: 0
+    }
+  }, ["jobs", "profile"].map(function (t) {
+    return /*#__PURE__*/React.createElement("button", {
+      key: t,
+      className: "btn",
+      onClick: function onClick() {
+        return setTab(t);
+      },
+      style: {
+        padding: "6px 12px",
+        borderRadius: 8,
+        fontSize: 13,
+        fontFamily: "inherit",
+        background: tab === t ? "#1e3a5f" : "transparent",
+        color: tab === t ? "#60a5fa" : "#64748b",
+        border: "1px solid ".concat(tab === t ? "#2563eb44" : "transparent")
+      }
+    }, t === "jobs" ? "🔍" : "👤");
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 7,
+      height: 7,
+      borderRadius: 4,
+      background: profile.name ? "#22c55e" : "#ef4444",
+      marginLeft: 2
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "0 14px 10px"
+    }
+  }, gmailUser ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "google-btn",
+    onClick: handleGmailSync,
+    disabled: fetchingEmail,
+    style: {
+      flex: 1,
+      justifyContent: "center"
+    }
+  }, fetchingEmail ? /*#__PURE__*/React.createElement("span", {
+    className: "spin"
+  }, "\u27F3") : "📧", " ", fetchingEmail ? "Scanning…" : "Sync Emails".concat(emailJobs.length ? " (".concat(emailJobs.length, ")") : "")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      padding: "7px 10px",
+      borderRadius: 8,
+      background: "#0a1e10",
+      border: "1px solid #065f4644",
+      flexShrink: 0
+    }
+  }, gmailUser.picture && /*#__PURE__*/React.createElement("img", {
+    src: gmailUser.picture,
+    style: {
+      width: 20,
+      height: 20,
+      borderRadius: 10
+    },
+    alt: ""
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn",
+    onClick: handleSignOut,
+    style: {
+      fontSize: 13,
+      color: "#475569",
+      lineHeight: 1
+    }
+  }, "\u2715"))) : /*#__PURE__*/React.createElement("button", {
+    className: "google-btn",
+    onClick: handleSignIn,
+    style: {
+      width: "100%",
+      justifyContent: "center"
+    }
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "16",
+    height: "16",
+    viewBox: "0 0 24 24",
+    style: {
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement("path", {
+    fill: "#4285F4",
+    d: "M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+  }), /*#__PURE__*/React.createElement("path", {
+    fill: "#34A853",
+    d: "M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+  }), /*#__PURE__*/React.createElement("path", {
+    fill: "#FBBC05",
+    d: "M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+  }), /*#__PURE__*/React.createElement("path", {
+    fill: "#EA4335",
+    d: "M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+  })), "Sign in with Google to sync job emails"))), /*#__PURE__*/React.createElement("div", {
     style: {
       maxWidth: 1100,
       margin: "0 auto",
@@ -1498,12 +1646,7 @@ function App() {
     setSelectedJob: setSelectedJob,
     onRefresh: loadBoardJobs,
     onApply: startApplyFlow,
-    applied: applied,
-    gmailUser: gmailUser,
-    onGmailConnect: function onGmailConnect() {
-      var _tokenClient2;
-      return (_tokenClient2 = tokenClient) === null || _tokenClient2 === void 0 ? void 0 : _tokenClient2.requestAccessToken();
-    }
+    applied: applied
   }) : /*#__PURE__*/React.createElement(ProfileTab, {
     profile: profile,
     onSave: handleSaveProfile
@@ -1538,28 +1681,29 @@ function App() {
     style: {
       position: "fixed",
       bottom: 24,
-      right: 24,
+      left: 14,
+      right: 14,
       background: toast.type === "error" ? "#7f1d1d" : toast.type === "info" ? "#1e3a5f" : "#16a34a",
       color: "white",
-      padding: "10px 18px",
-      borderRadius: 8,
+      padding: "12px 16px",
+      borderRadius: 10,
       fontSize: 13,
       fontWeight: 500,
       zIndex: 200,
       animation: "fadeIn 0.2s ease",
-      maxWidth: 360
+      textAlign: "center"
     }
   }, toast.msg));
 }
 
-// ─── Apply Flow Stages ────────────────────────────────────────────────────────
-function GeneratingStage(_ref4) {
-  var job = _ref4.job;
-  var _useState31 = useState(0),
-    _useState32 = _slicedToArray(_useState31, 2),
-    step = _useState32[0],
-    setStep = _useState32[1];
-  var steps = ["Tailoring CV with Gemini…", "Writing cover letter…", "Detecting missing form fields…"];
+// ─── Apply stages ─────────────────────────────────────────────────────────────
+function GeneratingStage(_ref6) {
+  var job = _ref6.job;
+  var _useState29 = useState(0),
+    _useState30 = _slicedToArray(_useState29, 2),
+    step = _useState30[0],
+    setStep = _useState30[1];
+  var steps = ["Tailoring CV with Gemini…", "Writing cover letter…", "Detecting missing fields…"];
   useEffect(function () {
     var t = setInterval(function () {
       return setStep(function (p) {
@@ -1599,8 +1743,9 @@ function GeneratingStage(_ref4) {
       display: "flex",
       flexDirection: "column",
       gap: 8,
-      maxWidth: 320,
-      margin: "0 auto"
+      maxWidth: 300,
+      margin: "0 auto",
+      textAlign: "left"
     }
   }, steps.map(function (s, i) {
     return /*#__PURE__*/React.createElement("div", {
@@ -1610,19 +1755,18 @@ function GeneratingStage(_ref4) {
         alignItems: "center",
         gap: 10,
         fontSize: 12,
-        color: i <= step ? "#60a5fa" : "#334155",
-        transition: "color 0.4s"
+        color: i <= step ? "#60a5fa" : "#334155"
       }
-    }, /*#__PURE__*/React.createElement("span", null, i < step ? "✅" : i === step ? "⟳" : "○"), " ", s);
+    }, /*#__PURE__*/React.createElement("span", null, i < step ? "✅" : i === step ? "⟳" : "○"), s);
   })));
 }
-function ReviewStage(_ref5) {
+function ReviewStage(_ref7) {
   var _PLATFORMS$find2;
-  var flow = _ref5.flow,
-    setFlow = _ref5.setFlow,
-    onApprove = _ref5.onApprove,
-    onClose = _ref5.onClose,
-    showToast = _ref5.showToast;
+  var flow = _ref7.flow,
+    setFlow = _ref7.setFlow,
+    onApprove = _ref7.onApprove,
+    onClose = _ref7.onClose,
+    showToast = _ref7.showToast;
   var job = flow.job,
     cv = flow.cv,
     coverLetter = flow.coverLetter,
@@ -1643,23 +1787,13 @@ function ReviewStage(_ref5) {
       fontWeight: 700,
       fontSize: 18
     }
-  }, "\u2728 Review Your Application"), /*#__PURE__*/React.createElement("div", {
+  }, "\u2728 Review Application"), /*#__PURE__*/React.createElement("div", {
     style: {
       color: "#64748b",
       fontSize: 12,
       marginTop: 3
     }
-  }, job.title, " @ ", job.company, hasCL && /*#__PURE__*/React.createElement("span", {
-    style: {
-      marginLeft: 8,
-      fontSize: 10,
-      padding: "1px 6px",
-      borderRadius: 3,
-      background: "#7c3aed22",
-      color: "#a78bfa",
-      border: "1px solid #7c3aed44"
-    }
-  }, "COVER LETTER"))), /*#__PURE__*/React.createElement("button", {
+  }, job.title, " @ ", job.company)), /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: onClose,
     style: {
@@ -1683,7 +1817,7 @@ function ReviewStage(_ref5) {
         });
       });
     }
-  }, "\uD83D\uDCC4 CV / Resume"), hasCL && /*#__PURE__*/React.createElement("button", {
+  }, "\uD83D\uDCC4 CV"), hasCL && /*#__PURE__*/React.createElement("button", {
     className: "dtab btn ".concat(activeDoc === "cl" ? "on" : "off"),
     onClick: function onClick() {
       return setFlow(function (p) {
@@ -1698,8 +1832,8 @@ function ReviewStage(_ref5) {
       border: "1px solid #1e3a5f",
       borderTop: "none",
       borderRadius: "0 0 8px 8px",
-      padding: 16,
-      marginBottom: 16
+      padding: 14,
+      marginBottom: 14
     }
   }, activeDoc === "cv" ? /*#__PURE__*/React.createElement("textarea", {
     value: cv || "",
@@ -1712,7 +1846,7 @@ function ReviewStage(_ref5) {
     },
     style: {
       width: "100%",
-      minHeight: 320,
+      minHeight: 300,
       fontFamily: "'DM Mono',monospace",
       fontSize: 12,
       lineHeight: 1.7,
@@ -1734,7 +1868,7 @@ function ReviewStage(_ref5) {
     },
     style: {
       width: "100%",
-      minHeight: 320,
+      minHeight: 300,
       fontFamily: "'DM Mono',monospace",
       fontSize: 12,
       lineHeight: 1.7,
@@ -1747,21 +1881,10 @@ function ReviewStage(_ref5) {
     }
   })), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "10px 14px",
-      background: "#0a1e38",
-      border: "1px solid #1e3a5f",
-      borderRadius: 8,
-      fontSize: 11,
-      color: "#60a5fa",
-      marginBottom: 16,
-      lineHeight: 1.8
-    }
-  }, /*#__PURE__*/React.createElement("strong", null, "After approval:"), " Job page opens \u2192 paste CV & cover letter into the form \u2192 profile fields auto-suggest \u2192 any unknown fields asked next"), /*#__PURE__*/React.createElement("div", {
-    style: {
       display: "flex",
       gap: 8,
-      justifyContent: "space-between",
-      flexWrap: "wrap"
+      flexWrap: "wrap",
+      justifyContent: "space-between"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1775,30 +1898,30 @@ function ReviewStage(_ref5) {
       showToast("CV copied!");
     },
     style: {
-      padding: "7px 13px",
+      padding: "8px 12px",
       background: "#1e293b",
       color: "#94a3b8",
       borderRadius: 8,
       fontSize: 12
     }
-  }, "\uD83D\uDCCB Copy CV"), hasCL && /*#__PURE__*/React.createElement("button", {
+  }, "\uD83D\uDCCB CV"), hasCL && /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: function onClick() {
       navigator.clipboard.writeText(coverLetter || "");
       showToast("Cover letter copied!");
     },
     style: {
-      padding: "7px 13px",
+      padding: "8px 12px",
       background: "#1e293b",
       color: "#94a3b8",
       borderRadius: 8,
       fontSize: 12
     }
-  }, "\uD83D\uDCCB Copy Letter")), /*#__PURE__*/React.createElement("button", {
+  }, "\uD83D\uDCCB Letter")), /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: onApprove,
     style: {
-      padding: "9px 24px",
+      padding: "9px 20px",
       background: "linear-gradient(135deg,#2563eb,#7c3aed)",
       color: "white",
       borderRadius: 8,
@@ -1807,17 +1930,17 @@ function ReviewStage(_ref5) {
     }
   }, "\u2705 Approve & Apply \u2192")));
 }
-function MissingFieldsStage(_ref6) {
-  var flow = _ref6.flow,
-    onSubmit = _ref6.onSubmit,
-    onBack = _ref6.onBack;
+function MissingFieldsStage(_ref8) {
+  var flow = _ref8.flow,
+    onSubmit = _ref8.onSubmit,
+    onBack = _ref8.onBack;
   var job = flow.job,
     missingFields = flow.missingFields,
     extraAnswers = flow.extraAnswers;
-  var _useState33 = useState(extraAnswers || {}),
-    _useState34 = _slicedToArray(_useState33, 2),
-    answers = _useState34[0],
-    setAnswers = _useState34[1];
+  var _useState31 = useState(extraAnswers || {}),
+    _useState32 = _slicedToArray(_useState31, 2),
+    answers = _useState32[0],
+    setAnswers = _useState32[1];
   var allFilled = missingFields.every(function (f) {
     return answers[f.field];
   });
@@ -1858,15 +1981,15 @@ function MissingFieldsStage(_ref6) {
       borderRadius: 8,
       fontSize: 11,
       color: "#fbbf24",
-      marginBottom: 18,
+      marginBottom: 16,
       lineHeight: 1.6
     }
-  }, "\u2139\uFE0F Gemini detected these fields in the job form but they're not in your profile. Answers are saved for future applications."), /*#__PURE__*/React.createElement("div", {
+  }, "These fields weren't in your profile. Answers are saved for future applications."), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       flexDirection: "column",
       gap: 14,
-      marginBottom: 22
+      marginBottom: 20
     }
   }, missingFields.map(function (f) {
     return /*#__PURE__*/React.createElement("div", {
@@ -1907,20 +2030,20 @@ function MissingFieldsStage(_ref6) {
     className: "btn",
     onClick: onBack,
     style: {
-      padding: "8px 16px",
+      padding: "8px 14px",
       background: "#1e293b",
       color: "#94a3b8",
       borderRadius: 8,
       fontSize: 13
     }
-  }, "\u2190 Review Docs"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2190 Back"), /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: function onClick() {
       return onSubmit(answers);
     },
     disabled: !allFilled,
     style: {
-      padding: "9px 24px",
+      padding: "9px 20px",
       background: allFilled ? "linear-gradient(135deg,#2563eb,#7c3aed)" : "#1e293b",
       color: "white",
       borderRadius: 8,
@@ -1931,30 +2054,25 @@ function MissingFieldsStage(_ref6) {
 }
 
 // ─── Jobs Tab ─────────────────────────────────────────────────────────────────
-function JobsTab(_ref7) {
+function JobsTab(_ref9) {
   var _selectedJob$reasons;
-  var jobs = _ref7.jobs,
-    allJobs = _ref7.allJobs,
-    loading = _ref7.loading,
-    minScore = _ref7.minScore,
-    setMinScore = _ref7.setMinScore,
-    selPlatforms = _ref7.selPlatforms,
-    setSelPlatforms = _ref7.setSelPlatforms,
-    remoteFilter = _ref7.remoteFilter,
-    setRemoteFilter = _ref7.setRemoteFilter,
-    sourceFilter = _ref7.sourceFilter,
-    setSourceFilter = _ref7.setSourceFilter,
-    selectedJob = _ref7.selectedJob,
-    setSelectedJob = _ref7.setSelectedJob,
-    onRefresh = _ref7.onRefresh,
-    _onApply = _ref7.onApply,
-    applied = _ref7.applied,
-    gmailUser = _ref7.gmailUser,
-    onGmailConnect = _ref7.onGmailConnect;
-  var emailCount = allJobs.filter(function (j) {
-    return j.source === "email";
-  }).length;
-  return /*#__PURE__*/React.createElement("div", null,  /*#__PURE__*/React.createElement("div", {
+  var jobs = _ref9.jobs,
+    allJobs = _ref9.allJobs,
+    loading = _ref9.loading,
+    minScore = _ref9.minScore,
+    setMinScore = _ref9.setMinScore,
+    selPlatforms = _ref9.selPlatforms,
+    setSelPlatforms = _ref9.setSelPlatforms,
+    remoteFilter = _ref9.remoteFilter,
+    setRemoteFilter = _ref9.setRemoteFilter,
+    sourceFilter = _ref9.sourceFilter,
+    setSourceFilter = _ref9.setSourceFilter,
+    selectedJob = _ref9.selectedJob,
+    setSelectedJob = _ref9.setSelectedJob,
+    onRefresh = _ref9.onRefresh,
+    _onApply = _ref9.onApply,
+    applied = _ref9.applied;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#0a1628",
       border: "1px solid #1e293b",
@@ -2018,17 +2136,23 @@ function JobsTab(_ref7) {
         borderRadius: 3
       }
     }, "CL"));
-  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "sl"
   }, "Work Type"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 5
     }
-  }, [["all", "All"], ["remote", "🌍 Remote"], ["office", "🏢 BLR"]].map(function (_ref8) {
-    var _ref9 = _slicedToArray(_ref8, 2),
-      v = _ref9[0],
-      l = _ref9[1];
+  }, [["all", "All"], ["remote", "🌍 Remote"], ["office", "🏢 BLR"]].map(function (_ref0) {
+    var _ref1 = _slicedToArray(_ref0, 2),
+      v = _ref1[0],
+      l = _ref1[1];
     return /*#__PURE__*/React.createElement("span", {
       key: v,
       className: "pill",
@@ -2048,10 +2172,10 @@ function JobsTab(_ref7) {
       display: "flex",
       gap: 5
     }
-  }, [["all", "All"], ["email", "📧 Email"], ["board", "🔍 Board"]].map(function (_ref0) {
-    var _ref1 = _slicedToArray(_ref0, 2),
-      v = _ref1[0],
-      l = _ref1[1];
+  }, [["all", "All"], ["email", "📧 Email"], ["board", "🔍 Board"]].map(function (_ref10) {
+    var _ref11 = _slicedToArray(_ref10, 2),
+      v = _ref11[0],
+      l = _ref11[1];
     return /*#__PURE__*/React.createElement("span", {
       key: v,
       className: "pill",
@@ -2064,9 +2188,15 @@ function JobsTab(_ref7) {
         borderColor: sourceFilter === v ? "#3b82f644" : "#1e293b"
       }
     }, l);
-  }))), /*#__PURE__*/React.createElement("div", {
+  })))), /*#__PURE__*/React.createElement("div", {
     style: {
-      minWidth: 160
+      display: "flex",
+      alignItems: "center",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "sl"
@@ -2094,20 +2224,20 @@ function JobsTab(_ref7) {
     style: {
       background: "#1e3a5f",
       color: "#60a5fa",
-      padding: "8px 14px",
+      padding: "9px 14px",
       borderRadius: 8,
       fontSize: 12,
-      border: "1px solid #2563eb44"
+      border: "1px solid #2563eb44",
+      flexShrink: 0
     }
-  }, loading ? "⟳ …" : "⟳ Refresh"))), /*#__PURE__*/React.createElement("div", {
+  }, loading ? "⟳ …" : "⟳ Refresh")))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 10,
-      marginBottom: 18,
+      marginBottom: 14,
       fontSize: 11,
       color: "#475569",
-      flexWrap: "wrap",
-      rowGap: 4
+      flexWrap: "wrap"
     }
   }, /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("span", {
     style: {
@@ -2126,7 +2256,9 @@ function JobsTab(_ref7) {
       color: "#34d399",
       fontWeight: 700
     }
-  }, emailCount), " from email"), "\xB7", /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("span", {
+  }, allJobs.filter(function (j) {
+    return j.source === "email";
+  }).length), " from email"), "\xB7", /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("span", {
     style: {
       color: "#4ade80",
       fontWeight: 700
@@ -2135,7 +2267,7 @@ function JobsTab(_ref7) {
     style: {
       display: "grid",
       gridTemplateColumns: selectedJob ? "360px 1fr" : "1fr",
-      gap: 16
+      gap: 14
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2195,24 +2327,24 @@ function JobsTab(_ref7) {
       background: "#0a1628",
       border: "1px solid #1e293b",
       borderRadius: 10,
-      padding: "22px",
+      padding: "20px",
       position: "sticky",
-      top: 16,
+      top: 70,
       alignSelf: "flex-start",
-      maxHeight: "85vh",
+      maxHeight: "80vh",
       overflow: "auto"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       justifyContent: "space-between",
-      marginBottom: 16
+      marginBottom: 14
     }
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "'Syne',sans-serif",
       fontWeight: 700,
-      fontSize: 18,
+      fontSize: 17,
       lineHeight: 1.2
     }
   }, selectedJob.title), /*#__PURE__*/React.createElement("div", {
@@ -2237,8 +2369,8 @@ function JobsTab(_ref7) {
     style: {
       display: "flex",
       flexWrap: "wrap",
-      gap: 8,
-      marginBottom: 16
+      gap: 6,
+      marginBottom: 14
     }
   }, /*#__PURE__*/React.createElement(ScoreBadge, {
     score: selectedJob.score,
@@ -2273,7 +2405,7 @@ function JobsTab(_ref7) {
     className: "applied-badge"
   }, "\u2713 APPLIED")), ((_selectedJob$reasons = selectedJob.reasons) === null || _selectedJob$reasons === void 0 ? void 0 : _selectedJob$reasons.length) > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
-      marginBottom: 16
+      marginBottom: 14
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "sl"
@@ -2287,11 +2419,20 @@ function JobsTab(_ref7) {
         borderBottom: "1px solid #0f172a"
       }
     }, "\u2022 ", r);
-  })), /*#__PURE__*/React.createElement("div", {
+  })), selectedJob.source === "mock" && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "8px 12px",
+      background: "#1a1a00",
+      border: "1px solid #78350f44",
+      borderRadius: 8,
+      fontSize: 11,
+      color: "#fbbf24",
+      marginBottom: 12,
+      lineHeight: 1.5
+    }
+  }, "\u26A0\uFE0F Sample listing \u2014 sync Gmail to get real jobs from your alert emails."), /*#__PURE__*/React.createElement("div", {
     className: "sl"
-  }, "Description"), selectedJob.source === "mock" && React.createElement("div", {
-    style: { padding: "8px 12px", background: "#1a1a00", border: "1px solid #78350f44", borderRadius: 8, fontSize: 11, color: "#fbbf24", marginBottom: 10, lineHeight: 1.5 }
-  }, "\u26A0\uFE0F Sample listing — connect Gmail to get real jobs from your email alerts. Apply opens a targeted search on this platform."), /*#__PURE__*/React.createElement("div", {
+  }, "Description"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       color: "#94a3b8",
@@ -2299,8 +2440,8 @@ function JobsTab(_ref7) {
       whiteSpace: "pre-wrap",
       background: "#061122",
       borderRadius: 8,
-      padding: 14,
-      marginBottom: 16
+      padding: 12,
+      marginBottom: 14
     }
   }, selectedJob.description), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2321,7 +2462,7 @@ function JobsTab(_ref7) {
       fontSize: 12,
       textDecoration: "none"
     }
-  }, selectedJob.source === "mock" ? "\uD83D\uDD0D Search on " + ({"linkedin":"LinkedIn","indeed":"Indeed","naukri":"Naukri","instahyre":"Instahyre","hirist":"Hirist","yc":"YC"}[selectedJob.platform] || "Platform") : "\uD83D\uDD17 View Job"), /*#__PURE__*/React.createElement("button", {
+  }, selectedJob.source === "mock" ? "🔍 Search" : "🔗 View Job"), /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: function onClick() {
       return _onApply(selectedJob);
@@ -2335,15 +2476,15 @@ function JobsTab(_ref7) {
       fontSize: 12,
       fontWeight: 600
     }
-  }, applied.has(selectedJob.id) ? "✓ Applied — Apply Again" : (selectedJob.source === "mock" ? "🔍 Find & Apply" : "✨ Generate Docs & Apply"))))));
+  }, applied.has(selectedJob.id) ? "✓ Apply Again" : "✨ Generate & Apply")))));
 }
-function JobCard(_ref10) {
-  var job = _ref10.job,
-    selected = _ref10.selected,
-    wasApplied = _ref10.wasApplied,
-    onClick = _ref10.onClick,
-    onApply = _ref10.onApply,
-    compact = _ref10.compact;
+function JobCard(_ref12) {
+  var job = _ref12.job,
+    selected = _ref12.selected,
+    wasApplied = _ref12.wasApplied,
+    onClick = _ref12.onClick,
+    onApply = _ref12.onApply,
+    compact = _ref12.compact;
   var plat = PLATFORMS.find(function (p) {
     return p.id === job.platform;
   }) || {
@@ -2354,7 +2495,6 @@ function JobCard(_ref10) {
     onClick: onClick,
     style: {
       background: selected ? "#0d1f38" : "#080f1e",
-      borderRadius: 10,
       padding: "12px 14px",
       cursor: "pointer",
       borderColor: selected ? "#2563eb44" : "#1e293b",
@@ -2447,7 +2587,7 @@ function JobCard(_ref10) {
       fontSize: 11,
       fontWeight: 600
     }
-  }, job.source === "mock" ? "\uD83D\uDD0D Find" : "Apply \u2728")), !compact && job.postedAt && /*#__PURE__*/React.createElement("div", {
+  }, job.source === "mock" ? "Find" : "Apply ✨")), !compact && job.postedAt && /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
       color: "#334155",
@@ -2457,57 +2597,17 @@ function JobCard(_ref10) {
 }
 
 // ─── Profile Tab ──────────────────────────────────────────────────────────────
-
-// ─── Hoisted from ProfileTab (fixes focus loss on re-render) ─
-var Sec = function Sec(_ref12) {
-    var title = _ref12.title,
-      children = _ref12.children;
-    return /*#__PURE__*/React.createElement("div", {
-      style: {
-        background: "#0a1628",
-        border: "1px solid #1e293b",
-        borderRadius: 10,
-        padding: "20px",
-        marginBottom: 16
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontFamily: "'Syne',sans-serif",
-        fontWeight: 700,
-        fontSize: 14,
-        marginBottom: 16,
-        color: "#60a5fa"
-      }
-    }, title), children);
-  };
-var F = function F(_ref13) {
-    var label = _ref13.label,
-      props = _objectWithoutProperties(_ref13, _excluded);
-    return /*#__PURE__*/React.createElement("div", {
-      style: {
-        marginBottom: 12
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "sl"
-    }, label), props.rows ? /*#__PURE__*/React.createElement("textarea", _extends({}, props, {
-      style: {
-        resize: "vertical",
-        minHeight: props.rows * 22
-      }
-    })) : /*#__PURE__*/React.createElement("input", props));
-  };
-
-function ProfileTab(_ref11) {
-  var profile = _ref11.profile,
-    onSave = _ref11.onSave;
-  var _useState35 = useState(profile),
+function ProfileTab(_ref13) {
+  var profile = _ref13.profile,
+    onSave = _ref13.onSave;
+  var _useState33 = useState(profile),
+    _useState34 = _slicedToArray(_useState33, 2),
+    p = _useState34[0],
+    setP = _useState34[1];
+  var _useState35 = useState("basic"),
     _useState36 = _slicedToArray(_useState35, 2),
-    p = _useState36[0],
-    setP = _useState36[1];
-  var _useState37 = useState("basic"),
-    _useState38 = _slicedToArray(_useState37, 2),
-    section = _useState38[0],
-    setSection = _useState38[1];
+    section = _useState36[0],
+    setSection = _useState36[1];
   var set = function set(f, v) {
     return setP(function (prev) {
       return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, f, v));
@@ -2581,7 +2681,7 @@ function ProfileTab(_ref11) {
       fontFamily: "'Syne',sans-serif",
       fontWeight: 800,
       fontSize: 22,
-      marginBottom: 20
+      marginBottom: 16
     }
   }, "\uD83D\uDC64 Your Profile"), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2589,11 +2689,9 @@ function ProfileTab(_ref11) {
       gap: 6,
       marginBottom: 16,
       overflowX: "auto",
-      paddingBottom: 4,
-      msOverflowStyle: "none",
-      scrollbarWidth: "none"
+      paddingBottom: 4
     }
-  }, [["basic", "🧑 Basic"], ["links", "🔗 Links & CTC"], ["experience", "💼 Experience"], ["education", "🎓 Education"], ["templates", "📄 Templates"]].map(function (_ref14) {
+  }, [["basic", "🧑 Basic"], ["links", "🔗 Links"], ["experience", "💼 Experience"], ["education", "🎓 Education"], ["templates", "📄 Templates"]].map(function (_ref14) {
     var _ref15 = _slicedToArray(_ref14, 2),
       id = _ref15[0],
       label = _ref15[1];
@@ -2604,10 +2702,11 @@ function ProfileTab(_ref11) {
         return setSection(id);
       },
       style: {
-        padding: "6px 14px",
+        padding: "7px 14px",
         borderRadius: 20,
         fontSize: 12,
         fontFamily: "inherit",
+        whiteSpace: "nowrap",
         background: section === id ? "#1e3a5f" : "transparent",
         color: section === id ? "#60a5fa" : "#475569",
         border: "1px solid ".concat(section === id ? "#2563eb44" : "#1e293b")
@@ -2670,7 +2769,7 @@ function ProfileTab(_ref11) {
     onChange: function onChange(e) {
       return set("skills", e.target.value);
     },
-    placeholder: "Node.js, React, PostgreSQL, AWS, Docker, Kubernetes, System Design\u2026",
+    placeholder: "Node.js, React, PostgreSQL, AWS, Docker, Kubernetes\u2026",
     rows: 3
   })), section === "links" && /*#__PURE__*/React.createElement(Sec, {
     title: "Links, CTC & Notice Period"
@@ -2678,10 +2777,10 @@ function ProfileTab(_ref11) {
     style: {
       fontSize: 12,
       color: "#475569",
-      marginBottom: 14,
+      marginBottom: 12,
       lineHeight: 1.6
     }
-  }, "Used to auto-fill job application forms. Blank fields will be asked when you apply."), /*#__PURE__*/React.createElement(F, {
+  }, "Used to auto-fill job forms. Blank fields will be asked per-application."), /*#__PURE__*/React.createElement(F, {
     label: "LinkedIn URL",
     value: p.linkedin,
     onChange: function onChange(e) {
@@ -2846,7 +2945,7 @@ function ProfileTab(_ref11) {
     }, "Remove")), /*#__PURE__*/React.createElement("div", {
       style: {
         display: "grid",
-        gridTemplateColumns: "1fr 1fr 100px",
+        gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))",
         gap: 10
       }
     }, /*#__PURE__*/React.createElement(F, {
@@ -2905,7 +3004,7 @@ function ProfileTab(_ref11) {
     },
     style: {
       width: "100%",
-      minHeight: 240,
+      minHeight: 220,
       fontFamily: "'DM Mono',monospace",
       fontSize: 12,
       lineHeight: 1.7,
@@ -2914,7 +3013,7 @@ function ProfileTab(_ref11) {
   }), /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: function onClick() {
-      return set("cvTemplate", DEFAULT_CV_TEMPLATE);
+      return set("cvTemplate", DEFAULT_CV);
     },
     style: {
       marginTop: 8,
@@ -2928,16 +3027,16 @@ function ProfileTab(_ref11) {
     title: "\u2709\uFE0F Cover Letter Template"
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: "10px 14px",
+      padding: "9px 12px",
       background: "#0a1e10",
       border: "1px solid #166534",
       borderRadius: 8,
       fontSize: 11,
       color: "#4ade80",
-      marginBottom: 12,
+      marginBottom: 10,
       lineHeight: 1.6
     }
-  }, "\u2705 Auto-generated for ", /*#__PURE__*/React.createElement("strong", null, "LinkedIn, Indeed, Naukri"), ". Gemini fills all placeholders from your profile."), /*#__PURE__*/React.createElement("div", {
+  }, "\u2705 Auto-generated for ", /*#__PURE__*/React.createElement("strong", null, "LinkedIn, Indeed, Naukri")), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       color: "#475569",
@@ -2959,7 +3058,7 @@ function ProfileTab(_ref11) {
     },
     style: {
       width: "100%",
-      minHeight: 280,
+      minHeight: 260,
       fontFamily: "'DM Mono',monospace",
       fontSize: 12,
       lineHeight: 1.7,
@@ -2968,7 +3067,7 @@ function ProfileTab(_ref11) {
   }), /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: function onClick() {
-      return set("coverLetterTemplate", DEFAULT_COVER_LETTER_TEMPLATE);
+      return set("coverLetterTemplate", DEFAULT_CL);
     },
     style: {
       marginTop: 8,
@@ -2985,7 +3084,7 @@ function ProfileTab(_ref11) {
     },
     style: {
       width: "100%",
-      padding: "12px",
+      padding: "13px",
       background: "linear-gradient(135deg,#2563eb,#7c3aed)",
       color: "white",
       borderRadius: 10,
@@ -2998,20 +3097,29 @@ function ProfileTab(_ref11) {
 }
 
 // Mount
-var root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(React.createElement(App));
-(function() {
-  var check = setInterval(function() {
+var _root = ReactDOM.createRoot(document.getElementById('root'));
+_root.render(React.createElement(App));
+(function hideSplash() {
+  var check = setInterval(function () {
     var root = document.getElementById('root');
     var s = document.getElementById('splash');
-    if (!s) { clearInterval(check); return; }
+    if (!s) {
+      clearInterval(check);
+      return;
+    }
     if (root && root.children.length > 0) {
       clearInterval(check);
       s.classList.add('hide');
-      setTimeout(function(){ s && s.remove(); }, 600);
+      setTimeout(function () {
+        s && s.remove();
+      }, 600);
     }
   }, 150);
-  setTimeout(function() { clearInterval(check); var s=document.getElementById('splash'); s&&s.remove(); }, 8000);
+  setTimeout(function () {
+    clearInterval(check);
+    var s = document.getElementById('splash');
+    s && s.remove();
+  }, 8000);
 })();
 
 </script>
