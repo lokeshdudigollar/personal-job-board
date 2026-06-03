@@ -242,7 +242,7 @@ function callGemini(_x) {
   return _callGemini.apply(this, arguments);
 }
 function _callGemini() {
-  _callGemini = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(prompt) {
+  _callGemini = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(prompt) {
     var jsonMode,
       retries,
       attempt,
@@ -251,19 +251,19 @@ function _callGemini() {
       wait,
       e,
       d,
-      _args7 = arguments;
-    return _regenerator().w(function (_context7) {
-      while (1) switch (_context7.n) {
+      _args8 = arguments;
+    return _regenerator().w(function (_context8) {
+      while (1) switch (_context8.n) {
         case 0:
-          jsonMode = _args7.length > 1 && _args7[1] !== undefined ? _args7[1] : false;
-          retries = _args7.length > 2 && _args7[2] !== undefined ? _args7[2] : 3;
+          jsonMode = _args8.length > 1 && _args8[1] !== undefined ? _args8[1] : false;
+          retries = _args8.length > 2 && _args8[2] !== undefined ? _args8[2] : 3;
           attempt = 0;
         case 1:
           if (!(attempt < retries)) {
-            _context7.n = 9;
+            _context8.n = 9;
             break;
           }
-          _context7.n = 2;
+          _context8.n = 2;
           return fetch(GEMINI_URL, {
             method: "POST",
             headers: {
@@ -284,43 +284,43 @@ function _callGemini() {
             })
           });
         case 2:
-          res = _context7.v;
+          res = _context8.v;
           if (!(res.status === 429)) {
-            _context7.n = 4;
+            _context8.n = 4;
             break;
           }
           wait = (attempt + 1) * 5000; // 5s, 10s, 15s
           console.log("[JobHunt] Gemini rate limited, retrying in ".concat(wait / 1000, "s..."));
-          _context7.n = 3;
+          _context8.n = 3;
           return sleep(wait);
         case 3:
-          return _context7.a(3, 8);
+          return _context8.a(3, 8);
         case 4:
           if (res.ok) {
-            _context7.n = 6;
+            _context8.n = 6;
             break;
           }
-          _context7.n = 5;
+          _context8.n = 5;
           return res.text();
         case 5:
-          e = _context7.v;
+          e = _context8.v;
           throw new Error("Gemini error: ".concat(e));
         case 6:
-          _context7.n = 7;
+          _context8.n = 7;
           return res.json();
         case 7:
-          d = _context7.v;
-          return _context7.a(2, ((_d$candidates = d.candidates) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates[0]) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates.content) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates.parts) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates[0]) === null || _d$candidates === void 0 ? void 0 : _d$candidates.text) || "");
+          d = _context8.v;
+          return _context8.a(2, ((_d$candidates = d.candidates) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates[0]) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates.content) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates.parts) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates[0]) === null || _d$candidates === void 0 ? void 0 : _d$candidates.text) || "");
         case 8:
           attempt++;
-          _context7.n = 1;
+          _context8.n = 1;
           break;
         case 9:
           throw new Error("Gemini rate limit exceeded — try again in a minute");
         case 10:
-          return _context7.a(2);
+          return _context8.a(2);
       }
-    }, _callee6);
+    }, _callee7);
   }));
   return _callGemini.apply(this, arguments);
 }
@@ -328,35 +328,35 @@ function scoreJob(_x2, _x3) {
   return _scoreJob.apply(this, arguments);
 }
 function _scoreJob() {
-  _scoreJob = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(job, profile) {
+  _scoreJob = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(job, profile) {
     var t, _t7;
-    return _regenerator().w(function (_context8) {
-      while (1) switch (_context8.p = _context8.n) {
+    return _regenerator().w(function (_context9) {
+      while (1) switch (_context9.p = _context9.n) {
         case 0:
           if (!(!profile.skills && !profile.summary)) {
-            _context8.n = 1;
+            _context9.n = 1;
             break;
           }
-          return _context8.a(2, {
+          return _context9.a(2, {
             score: 0,
             reasons: ["Complete your profile first"]
           });
         case 1:
-          _context8.p = 1;
-          _context8.n = 2;
+          _context9.p = 1;
+          _context9.n = 2;
           return callGemini("You are a recruiter. Score candidate-job match 0-100.\nCANDIDATE: ".concat(profile.title, ", Skills: ").concat(profile.skills, ", Summary: ").concat((profile.summary || "").slice(0, 300), "\nJOB: ").concat(job.title, " at ").concat(job.company, ". ").concat((job.description || "").slice(0, 400), "\nRespond ONLY with JSON: {\"score\":<number>,\"reasons\":[\"r1\",\"r2\",\"r3\"]}"), true);
         case 2:
-          t = _context8.v;
-          return _context8.a(2, JSON.parse(t.replace(/```json|```/g, "").trim()));
+          t = _context9.v;
+          return _context9.a(2, JSON.parse(t.replace(/```json|```/g, "").trim()));
         case 3:
-          _context8.p = 3;
-          _t7 = _context8.v;
-          return _context8.a(2, {
+          _context9.p = 3;
+          _t7 = _context9.v;
+          return _context9.a(2, {
             score: 50,
             reasons: ["Match score unavailable"]
           });
       }
-    }, _callee7, null, [[1, 3]]);
+    }, _callee8, null, [[1, 3]]);
   }));
   return _scoreJob.apply(this, arguments);
 }
@@ -364,19 +364,19 @@ function generateCuratedCV(_x4, _x5) {
   return _generateCuratedCV.apply(this, arguments);
 }
 function _generateCuratedCV() {
-  _generateCuratedCV = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(job, profile) {
-    return _regenerator().w(function (_context9) {
-      while (1) switch (_context9.n) {
+  _generateCuratedCV = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9(job, profile) {
+    return _regenerator().w(function (_context0) {
+      while (1) switch (_context0.n) {
         case 0:
-          _context9.n = 1;
+          _context0.n = 1;
           return callGemini("You are a professional resume writer. Tailor this CV for the job using ONLY the candidate's real info.\nPROFILE: ".concat(JSON.stringify(_objectSpread(_objectSpread({}, profile), {}, {
             cvTemplate: undefined,
             coverLetterTemplate: undefined
           })), "\nJOB: ").concat(job.title, " at ").concat(job.company, "\nDESCRIPTION: ").concat((job.description || "").slice(0, 700), "\nTEMPLATE:\n").concat(profile.cvTemplate, "\nReturn ONLY the filled CV text."));
         case 1:
-          return _context9.a(2, _context9.v);
+          return _context0.a(2, _context0.v);
       }
-    }, _callee8);
+    }, _callee9);
   }));
   return _generateCuratedCV.apply(this, arguments);
 }
@@ -384,25 +384,25 @@ function generateCoverLetter(_x6, _x7) {
   return _generateCoverLetter.apply(this, arguments);
 }
 function _generateCoverLetter() {
-  _generateCoverLetter = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9(job, profile) {
+  _generateCoverLetter = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(job, profile) {
     var today;
-    return _regenerator().w(function (_context0) {
-      while (1) switch (_context0.n) {
+    return _regenerator().w(function (_context1) {
+      while (1) switch (_context1.n) {
         case 0:
           today = new Date().toLocaleDateString("en-IN", {
             day: "numeric",
             month: "long",
             year: "numeric"
           });
-          _context0.n = 1;
+          _context1.n = 1;
           return callGemini("Write a compelling personalised cover letter using ONLY the candidate's real data.\nPROFILE: ".concat(JSON.stringify(_objectSpread(_objectSpread({}, profile), {}, {
             cvTemplate: undefined,
             coverLetterTemplate: undefined
           })), "\nJOB: ").concat(job.title, " at ").concat(job.company, "\nDESCRIPTION: ").concat((job.description || "").slice(0, 700), "\nTEMPLATE:\n").concat(profile.coverLetterTemplate, "\n{date}=").concat(today, ", {years_experience}=estimate from experience, {top_skills}=3-4 most relevant skills, {why_company_paragraph}=2-3 specific sentences, {key_achievements_paragraph}=2-3 achievements.\nReturn ONLY the final cover letter."));
         case 1:
-          return _context0.a(2, _context0.v);
+          return _context1.a(2, _context1.v);
       }
-    }, _callee9);
+    }, _callee0);
   }));
   return _generateCoverLetter.apply(this, arguments);
 }
@@ -410,10 +410,10 @@ function detectMissingFields(_x8, _x9, _x0) {
   return _detectMissingFields.apply(this, arguments);
 }
 function _detectMissingFields() {
-  _detectMissingFields = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(job, profile, extraAnswers) {
+  _detectMissingFields = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(job, profile, extraAnswers) {
     var known, t, _t8;
-    return _regenerator().w(function (_context1) {
-      while (1) switch (_context1.p = _context1.n) {
+    return _regenerator().w(function (_context10) {
+      while (1) switch (_context10.p = _context10.n) {
         case 0:
           known = {
             name: profile.name,
@@ -429,18 +429,18 @@ function _detectMissingFields() {
             currentCTC: profile.currentCTC,
             skills: profile.skills
           };
-          _context1.p = 1;
-          _context1.n = 2;
+          _context10.p = 1;
+          _context10.n = 2;
           return callGemini("Job application form analysis.\nJOB: ".concat(job.title, " at ").concat(job.company, ". ").concat((job.description || "").slice(0, 400), "\nKNOWN FIELDS: ").concat(JSON.stringify(known), "\nALREADY ANSWERED: ").concat(Object.keys(extraAnswers || {}).join(", ") || "none", "\nReturn ONLY a JSON array of missing fields: [{\"field\":\"name\",\"question\":\"Question?\",\"type\":\"text|number|select\",\"options\":[]}]\nMax 5 fields. If nothing missing return []."), true);
         case 2:
-          t = _context1.v;
-          return _context1.a(2, JSON.parse(t.replace(/```json|```/g, "").trim()));
+          t = _context10.v;
+          return _context10.a(2, JSON.parse(t.replace(/```json|```/g, "").trim()));
         case 3:
-          _context1.p = 3;
-          _t8 = _context1.v;
-          return _context1.a(2, []);
+          _context10.p = 3;
+          _t8 = _context10.v;
+          return _context10.a(2, []);
       }
-    }, _callee0, null, [[1, 3]]);
+    }, _callee1, null, [[1, 3]]);
   }));
   return _detectMissingFields.apply(this, arguments);
 }
@@ -450,27 +450,34 @@ function parseEmailJobs(_x1, _x10) {
 // NO localStorage token caching — always use tokenClient for fresh tokens
 // This avoids all 401/expired token issues
 function _parseEmailJobs() {
-  _parseEmailJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(emailBodies, platformId) {
+  _parseEmailJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10(emailBodies, platformId) {
     var _PLATFORMS$find3;
-    var name, t, _t9;
-    return _regenerator().w(function (_context10) {
-      while (1) switch (_context10.p = _context10.n) {
+    var name, t, clean, parsed, _t9;
+    return _regenerator().w(function (_context11) {
+      while (1) switch (_context11.p = _context11.n) {
         case 0:
           name = ((_PLATFORMS$find3 = PLATFORMS.find(function (p) {
             return p.id === platformId;
           })) === null || _PLATFORMS$find3 === void 0 ? void 0 : _PLATFORMS$find3.name) || platformId;
-          _context10.p = 1;
-          _context10.n = 2;
-          return callGemini("Extract ALL job listings from these ".concat(name, " job alert emails.\nReturn a JSON array: [{\"title\":string,\"company\":string,\"location\":string,\"remote\":boolean,\"url\":string,\"description\":string,\"salary\":string|null}]\n- remote=true only if explicitly mentioned\n- url = direct job application link (not tracking link)\n- description = 2-3 sentence summary\nIf no jobs found return [].\nEMAIL CONTENT:\n").concat(emailBodies.slice(0, 6000), "\nRespond ONLY with a valid JSON array."), true);
+          _context11.p = 1;
+          console.log("[JobHunt] Parsing ".concat(name, ", body length: ").concat(emailBodies.length, " chars"));
+          console.log("[JobHunt] Body preview: ".concat(emailBodies.slice(0, 400)));
+          _context11.n = 2;
+          return callGemini("Extract ALL job listings from these ".concat(name, " job alert emails.\nReturn a JSON array: [{\"title\":string,\"company\":string,\"location\":string,\"remote\":boolean,\"url\":string,\"description\":string,\"salary\":string|null}]\n- remote=true only if explicitly mentioned\n- url = direct job application link (not a redirect/tracking link if possible)\n- description = 2-3 sentence summary of the role\n- Extract EVERY job mentioned, even if just a title and company\nIf no jobs found return [].\nEMAIL CONTENT:\n").concat(emailBodies.slice(0, 6000), "\nRespond ONLY with a valid JSON array. No markdown, no explanation."), true);
         case 2:
-          t = _context10.v;
-          return _context10.a(2, JSON.parse(t.replace(/```json|```/g, "").trim()));
+          t = _context11.v;
+          console.log("[JobHunt] Gemini response for ".concat(name, ":"), t.slice(0, 600));
+          clean = t.replace(/```json|```/g, "").trim();
+          parsed = JSON.parse(clean);
+          console.log("[JobHunt] Successfully parsed ".concat(parsed.length, " jobs from ").concat(name));
+          return _context11.a(2, parsed);
         case 3:
-          _context10.p = 3;
-          _t9 = _context10.v;
-          return _context10.a(2, []);
+          _context11.p = 3;
+          _t9 = _context11.v;
+          console.error("[JobHunt] parseEmailJobs FAILED for ".concat(name, ":"), _t9.message);
+          return _context11.a(2, []);
       }
-    }, _callee1, null, [[1, 3]]);
+    }, _callee10, null, [[1, 3]]);
   }));
   return _parseEmailJobs.apply(this, arguments);
 }
@@ -556,35 +563,35 @@ function gmailFetch(_x12, _x13) {
   return _gmailFetch.apply(this, arguments);
 }
 function _gmailFetch() {
-  _gmailFetch = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10(path, token) {
+  _gmailFetch = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11(path, token) {
     var res;
-    return _regenerator().w(function (_context11) {
-      while (1) switch (_context11.n) {
+    return _regenerator().w(function (_context12) {
+      while (1) switch (_context12.n) {
         case 0:
-          _context11.n = 1;
+          _context12.n = 1;
           return fetch("https://gmail.googleapis.com/gmail/v1".concat(path), {
             headers: {
               Authorization: "Bearer ".concat(token)
             }
           });
         case 1:
-          res = _context11.v;
+          res = _context12.v;
           if (!(res.status === 401)) {
-            _context11.n = 2;
+            _context12.n = 2;
             break;
           }
           currentAccessToken = null;
           throw new Error("Token expired — please sign in again");
         case 2:
           if (res.ok) {
-            _context11.n = 3;
+            _context12.n = 3;
             break;
           }
           throw new Error("Gmail API error ".concat(res.status));
         case 3:
-          return _context11.a(2, res.json());
+          return _context12.a(2, res.json());
       }
-    }, _callee10);
+    }, _callee11);
   }));
   return _gmailFetch.apply(this, arguments);
 }
@@ -634,12 +641,34 @@ function fetchJobEmailsFromGmail(_x14) {
   return _fetchJobEmailsFromGmail.apply(this, arguments);
 } // ─── YC Jobs ──────────────────────────────────────────────────────────────────
 function _fetchJobEmailsFromGmail() {
-  _fetchJobEmailsFromGmail = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11(token) {
+  _fetchJobEmailsFromGmail = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee12(token) {
     var _listRes$messages, _listRes$messages2;
-    var allSenders, senderQ, subjectQ, query, listRes, messages, grouped, _iterator4, _step4, _loop2, jobs, _i, _Object$entries, _Object$entries$_i, platformId, bodies, parsed, _iterator5, _step5, j, remote, loc, _t0, _t1;
-    return _regenerator().w(function (_context13) {
-      while (1) switch (_context13.p = _context13.n) {
+    var allSenders, senderQ, subjectQ, query, listRes, messages, grouped, _iterator6, _step6, _loop2, allChunks, _i2, _Object$entries2, _Object$entries2$_i, platformId, bodies, _iterator7, _step7, body, BATCH_SIZE, firstBatch, remainingBatches, i, chunkToJob, firstGrouped, _iterator8, _step8, _step8$value, _platformId3, jobs, _i3, _Object$entries3, _Object$entries3$_i, _platformId2, _bodies, parsed, _iterator9, _step9, j, job, _t0;
+    return _regenerator().w(function (_context14) {
+      while (1) switch (_context14.p = _context14.n) {
         case 0:
+          chunkToJob = function _chunkToJob(j, platformId) {
+            var remote = j.remote || /remote/i.test(j.location || "");
+            var loc = j.location || (remote ? "Remote" : "");
+            if (!remote && !/bengaluru|bangalore/i.test(loc)) return null;
+            return {
+              id: "email_".concat(platformId, "_").concat(Date.now(), "_").concat(Math.random().toString(36).slice(2, 7)),
+              platform: platformId,
+              source: "email",
+              title: j.title || "Software Engineer",
+              company: j.company || "Unknown",
+              description: j.description || "",
+              salary: j.salary || null,
+              remote: remote,
+              location: remote ? "Remote – Worldwide" : loc,
+              country: detectCountry(j.location || ""),
+              url: j.url || platformUrl(platformId, j.title, j.company),
+              score: null,
+              reasons: [],
+              scoreLoading: false,
+              postedAt: "from email"
+            };
+          };
           // Build query from all known senders
           allSenders = PLATFORMS.filter(function (p) {
             return p.emailSource;
@@ -648,22 +677,22 @@ function _fetchJobEmailsFromGmail() {
           });
           senderQ = allSenders.map(function (s) {
             return "from:".concat(s);
-          }).join(" OR "); // Also search by platform names in subject as fallback
+          }).join(" OR ");
           subjectQ = "subject:(job OR jobs OR opening OR alert OR recommendation) (linkedin OR naukri OR indeed OR instahyre OR hirist)";
           query = "(".concat(senderQ, " OR ").concat(subjectQ, ") newer_than:14d");
           console.log("[JobHunt] Gmail query:", query);
-          _context13.n = 1;
-          return gmailFetch("/users/me/messages?q=".concat(encodeURIComponent(query), "&maxResults=40"), token);
+          _context14.n = 1;
+          return gmailFetch("/users/me/messages?q=".concat(encodeURIComponent(query), "&maxResults=60"), token);
         case 1:
-          listRes = _context13.v;
+          listRes = _context14.v;
           console.log("[JobHunt] Gmail list result:", ((_listRes$messages = listRes.messages) === null || _listRes$messages === void 0 ? void 0 : _listRes$messages.length) || 0, "messages, error:", listRes.error || "none");
           if ((_listRes$messages2 = listRes.messages) !== null && _listRes$messages2 !== void 0 && _listRes$messages2.length) {
-            _context13.n = 2;
+            _context14.n = 2;
             break;
           }
-          return _context13.a(2, []);
+          return _context14.a(2, []);
         case 2:
-          _context13.n = 3;
+          _context14.n = 3;
           return Promise.all(listRes.messages.map(function (m) {
             return gmailFetch("/users/me/messages/".concat(m.id, "?format=full"), token)["catch"](function (e) {
               console.warn("fetch msg failed", e);
@@ -671,7 +700,7 @@ function _fetchJobEmailsFromGmail() {
             });
           }));
         case 3:
-          messages = _context13.v;
+          messages = _context14.v;
           // Log every email for debugging
           messages.filter(Boolean).forEach(function (m, i) {
             var _m$payload, _m$payload2;
@@ -686,15 +715,15 @@ function _fetchJobEmailsFromGmail() {
 
           // Group by platform
           grouped = {};
-          _iterator4 = _createForOfIteratorHelper(messages.filter(Boolean));
-          _context13.p = 4;
+          _iterator6 = _createForOfIteratorHelper(messages.filter(Boolean));
+          _context14.p = 4;
           _loop2 = /*#__PURE__*/_regenerator().m(function _loop2() {
             var _msg$payload, _msg$payload2;
             var msg, fromH, subjH, fromLow, subjLow, body, platform;
-            return _regenerator().w(function (_context12) {
-              while (1) switch (_context12.n) {
+            return _regenerator().w(function (_context13) {
+              while (1) switch (_context13.n) {
                 case 0:
-                  msg = _step4.value;
+                  msg = _step6.value;
                   fromH = ((_msg$payload = msg.payload) === null || _msg$payload === void 0 || (_msg$payload = _msg$payload.headers) === null || _msg$payload === void 0 || (_msg$payload = _msg$payload.find(function (h) {
                     return h.name.toLowerCase() === "from";
                   })) === null || _msg$payload === void 0 ? void 0 : _msg$payload.value) || "";
@@ -716,120 +745,135 @@ function _fetchJobEmailsFromGmail() {
                   });
                   console.log("[JobHunt] \"".concat(fromH, "\" -> platform: ").concat((platform === null || platform === void 0 ? void 0 : platform.id) || "NO MATCH"));
                   if (platform) {
-                    _context12.n = 1;
+                    _context13.n = 1;
                     break;
                   }
-                  return _context12.a(2, 1);
+                  return _context13.a(2, 1);
                 case 1:
                   if (!grouped[platform.id]) grouped[platform.id] = [];
                   grouped[platform.id].push("SUBJECT: ".concat(subjH, "\n").concat(body));
                 case 2:
-                  return _context12.a(2);
+                  return _context13.a(2);
               }
             }, _loop2);
           });
-          _iterator4.s();
+          _iterator6.s();
         case 5:
-          if ((_step4 = _iterator4.n()).done) {
-            _context13.n = 8;
+          if ((_step6 = _iterator6.n()).done) {
+            _context14.n = 8;
             break;
           }
-          return _context13.d(_regeneratorValues(_loop2()), 6);
+          return _context14.d(_regeneratorValues(_loop2()), 6);
         case 6:
-          if (!_context13.v) {
-            _context13.n = 7;
+          if (!_context14.v) {
+            _context14.n = 7;
             break;
           }
-          return _context13.a(3, 7);
+          return _context14.a(3, 7);
         case 7:
-          _context13.n = 5;
+          _context14.n = 5;
           break;
         case 8:
-          _context13.n = 10;
+          _context14.n = 10;
           break;
         case 9:
-          _context13.p = 9;
-          _t0 = _context13.v;
-          _iterator4.e(_t0);
+          _context14.p = 9;
+          _t0 = _context14.v;
+          _iterator6.e(_t0);
         case 10:
-          _context13.p = 10;
-          _iterator4.f();
-          return _context13.f(10);
+          _context14.p = 10;
+          _iterator6.f();
+          return _context14.f(10);
         case 11:
           console.log("[JobHunt] Grouped platforms:", Object.keys(grouped));
+
+          // Split all email bodies into flat list of {platformId, body} chunks (1 email per chunk)
+          allChunks = [];
+          for (_i2 = 0, _Object$entries2 = Object.entries(grouped); _i2 < _Object$entries2.length; _i2++) {
+            _Object$entries2$_i = _slicedToArray(_Object$entries2[_i2], 2), platformId = _Object$entries2$_i[0], bodies = _Object$entries2$_i[1];
+            _iterator7 = _createForOfIteratorHelper(bodies);
+            try {
+              for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
+                body = _step7.value;
+                allChunks.push({
+                  platformId: platformId,
+                  body: body
+                });
+              }
+            } catch (err) {
+              _iterator7.e(err);
+            } finally {
+              _iterator7.f();
+            }
+          }
+          console.log("[JobHunt] Total email chunks to parse: ".concat(allChunks.length));
+
+          // Process first batch of 15 immediately, return those jobs right away
+          // Remaining batches run in background via window._emailSyncContinuation
+          BATCH_SIZE = 15;
+          firstBatch = allChunks.slice(0, BATCH_SIZE);
+          remainingBatches = [];
+          for (i = BATCH_SIZE; i < allChunks.length; i += BATCH_SIZE) {
+            remainingBatches.push(allChunks.slice(i, i + BATCH_SIZE));
+          }
+          // Group first batch by platform and parse
+          firstGrouped = {};
+          _iterator8 = _createForOfIteratorHelper(firstBatch);
+          try {
+            for (_iterator8.s(); !(_step8 = _iterator8.n()).done;) {
+              _step8$value = _step8.value, _platformId3 = _step8$value.platformId, body = _step8$value.body;
+              if (!firstGrouped[_platformId3]) firstGrouped[_platformId3] = [];
+              firstGrouped[_platformId3].push(body);
+            }
+          } catch (err) {
+            _iterator8.e(err);
+          } finally {
+            _iterator8.f();
+          }
           jobs = [];
-          _i = 0, _Object$entries = Object.entries(grouped);
+          _i3 = 0, _Object$entries3 = Object.entries(firstGrouped);
         case 12:
-          if (!(_i < _Object$entries.length)) {
-            _context13.n = 23;
+          if (!(_i3 < _Object$entries3.length)) {
+            _context14.n = 15;
             break;
           }
-          _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2), platformId = _Object$entries$_i[0], bodies = _Object$entries$_i[1];
-          _context13.n = 13;
-          return sleep(2000);
+          _Object$entries3$_i = _slicedToArray(_Object$entries3[_i3], 2), _platformId2 = _Object$entries3$_i[0], _bodies = _Object$entries3$_i[1];
+          _context14.n = 13;
+          return parseEmailJobs(_bodies.join("\n\n---\n\n"), _platformId2);
         case 13:
-          _context13.n = 14;
-          return parseEmailJobs(bodies.join("\n\n---\n\n"), platformId);
+          parsed = _context14.v;
+          _iterator9 = _createForOfIteratorHelper(parsed);
+          try {
+            for (_iterator9.s(); !(_step9 = _iterator9.n()).done;) {
+              j = _step9.value;
+              job = chunkToJob(j, _platformId2);
+              if (job) jobs.push(job);
+            }
+          } catch (err) {
+            _iterator9.e(err);
+          } finally {
+            _iterator9.f();
+          }
         case 14:
-          parsed = _context13.v;
-          console.log("[JobHunt] Parsed ".concat(parsed.length, " jobs from ").concat(platformId));
-          _iterator5 = _createForOfIteratorHelper(parsed);
-          _context13.p = 15;
-          _iterator5.s();
-        case 16:
-          if ((_step5 = _iterator5.n()).done) {
-            _context13.n = 19;
-            break;
+          _i3++;
+          _context14.n = 12;
+          break;
+        case 15:
+          console.log("[JobHunt] First batch: ".concat(jobs.length, " jobs. ").concat(remainingBatches.length, " more batches queued."));
+
+          // Schedule remaining batches in background (60s apart, uses window callback set by App)
+          if (remainingBatches.length > 0) {
+            window._emailSyncContinuation = {
+              batches: remainingBatches,
+              batchIndex: 0,
+              chunkToJob: chunkToJob,
+              token: token
+            };
+            console.log("[JobHunt] Background sync queued: ".concat(remainingBatches.length, " batches \xD7 60s"));
           }
-          j = _step5.value;
-          remote = j.remote || /remote/i.test(j.location || "");
-          loc = j.location || (remote ? "Remote" : "");
-          if (!(!remote && !/bengaluru|bangalore/i.test(loc))) {
-            _context13.n = 17;
-            break;
-          }
-          return _context13.a(3, 18);
-        case 17:
-          jobs.push({
-            id: "email_".concat(platformId, "_").concat(Date.now(), "_").concat(Math.random().toString(36).slice(2, 7)),
-            platform: platformId,
-            source: "email",
-            title: j.title || "Software Engineer",
-            company: j.company || "Unknown",
-            description: j.description || "",
-            salary: j.salary || null,
-            remote: remote,
-            location: remote ? "Remote – Worldwide" : loc,
-            country: detectCountry(j.location || ""),
-            url: j.url || platformUrl(platformId, j.title, j.company),
-            score: null,
-            reasons: [],
-            scoreLoading: false,
-            postedAt: "from email"
-          });
-        case 18:
-          _context13.n = 16;
-          break;
-        case 19:
-          _context13.n = 21;
-          break;
-        case 20:
-          _context13.p = 20;
-          _t1 = _context13.v;
-          _iterator5.e(_t1);
-        case 21:
-          _context13.p = 21;
-          _iterator5.f();
-          return _context13.f(21);
-        case 22:
-          _i++;
-          _context13.n = 12;
-          break;
-        case 23:
-          console.log("[JobHunt] Total email jobs:", jobs.length);
-          return _context13.a(2, jobs);
+          return _context14.a(2, jobs);
       }
-    }, _callee11, null, [[15, 20, 21, 22], [4, 9, 10, 11]]);
+    }, _callee12, null, [[4, 9, 10, 11]]);
   }));
   return _fetchJobEmailsFromGmail.apply(this, arguments);
 }
@@ -837,37 +881,37 @@ function fetchYCJobs() {
   return _fetchYCJobs.apply(this, arguments);
 }
 function _fetchYCJobs() {
-  _fetchYCJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee12() {
-    var u, stories, thread, comments, _t10;
-    return _regenerator().w(function (_context14) {
-      while (1) switch (_context14.p = _context14.n) {
+  _fetchYCJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee13() {
+    var u, stories, thread, comments, _t1;
+    return _regenerator().w(function (_context15) {
+      while (1) switch (_context15.p = _context15.n) {
         case 0:
-          _context14.p = 0;
-          _context14.n = 1;
+          _context15.p = 0;
+          _context15.n = 1;
           return fetch("https://hacker-news.firebaseio.com/v0/user/whoishiring.json").then(function (r) {
             return r.json();
           });
         case 1:
-          u = _context14.v;
-          _context14.n = 2;
+          u = _context15.v;
+          _context15.n = 2;
           return Promise.all((u.submitted || []).slice(0, 5).map(function (id) {
             return fetch("https://hacker-news.firebaseio.com/v0/item/".concat(id, ".json")).then(function (r) {
               return r.json();
             });
           }));
         case 2:
-          stories = _context14.v;
+          stories = _context15.v;
           thread = stories.find(function (s) {
             var _s$title, _s$title2;
             return ((_s$title = s.title) === null || _s$title === void 0 ? void 0 : _s$title.includes("Who is Hiring")) && ((_s$title2 = s.title) === null || _s$title2 === void 0 ? void 0 : _s$title2.includes("2025"));
           });
           if (thread) {
-            _context14.n = 3;
+            _context15.n = 3;
             break;
           }
-          return _context14.a(2, []);
+          return _context15.a(2, []);
         case 3:
-          _context14.n = 4;
+          _context15.n = 4;
           return Promise.all((thread.kids || []).slice(0, 60).map(function (id) {
             return fetch("https://hacker-news.firebaseio.com/v0/item/".concat(id, ".json")).then(function (r) {
               return r.json();
@@ -876,8 +920,8 @@ function _fetchYCJobs() {
             });
           }));
         case 4:
-          comments = _context14.v;
-          return _context14.a(2, comments.filter(Boolean).filter(function (c) {
+          comments = _context15.v;
+          return _context15.a(2, comments.filter(Boolean).filter(function (c) {
             var _c$text;
             return ((_c$text = c.text) === null || _c$text === void 0 ? void 0 : _c$text.length) > 100;
           }).map(function (c) {
@@ -906,11 +950,11 @@ function _fetchYCJobs() {
             };
           }));
         case 5:
-          _context14.p = 5;
-          _t10 = _context14.v;
-          return _context14.a(2, []);
+          _context15.p = 5;
+          _t1 = _context15.v;
+          return _context15.a(2, []);
       }
-    }, _callee12, null, [[0, 5]]);
+    }, _callee13, null, [[0, 5]]);
   }));
   return _fetchYCJobs.apply(this, arguments);
 }
@@ -1165,6 +1209,111 @@ function App() {
       setGmailUser(user);
     });
   }, []);
+
+  // ── Background batch processor — runs remaining email batches 60s apart ──
+  useEffect(function () {
+    var timer = null;
+    function processBatch() {
+      return _processBatch.apply(this, arguments);
+    } // Check every 5s if a continuation was queued
+    function _processBatch() {
+      _processBatch = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
+        var cont, batch, grouped, _iterator3, _step3, _step3$value, _platformId, body, newJobs, _i, _Object$entries, _Object$entries$_i, platformId, bodies, parsed, _iterator4, _step4, j, job;
+        return _regenerator().w(function (_context2) {
+          while (1) switch (_context2.n) {
+            case 0:
+              cont = window._emailSyncContinuation;
+              if (!(!cont || cont.batchIndex >= cont.batches.length)) {
+                _context2.n = 1;
+                break;
+              }
+              return _context2.a(2);
+            case 1:
+              batch = cont.batches[cont.batchIndex];
+              cont.batchIndex++;
+              console.log("[JobHunt] Background batch ".concat(cont.batchIndex, "/").concat(cont.batches.length, " starting..."));
+              // Group by platform
+              grouped = {};
+              _iterator3 = _createForOfIteratorHelper(batch);
+              try {
+                for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+                  _step3$value = _step3.value, _platformId = _step3$value.platformId, body = _step3$value.body;
+                  if (!grouped[_platformId]) grouped[_platformId] = [];
+                  grouped[_platformId].push(body);
+                }
+              } catch (err) {
+                _iterator3.e(err);
+              } finally {
+                _iterator3.f();
+              }
+              newJobs = [];
+              _i = 0, _Object$entries = Object.entries(grouped);
+            case 2:
+              if (!(_i < _Object$entries.length)) {
+                _context2.n = 5;
+                break;
+              }
+              _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2), platformId = _Object$entries$_i[0], bodies = _Object$entries$_i[1];
+              _context2.n = 3;
+              return parseEmailJobs(bodies.join("\n\n---\n\n"), platformId);
+            case 3:
+              parsed = _context2.v;
+              _iterator4 = _createForOfIteratorHelper(parsed);
+              try {
+                for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+                  j = _step4.value;
+                  job = cont.chunkToJob(j, platformId);
+                  if (job) newJobs.push(job);
+                }
+              } catch (err) {
+                _iterator4.e(err);
+              } finally {
+                _iterator4.f();
+              }
+            case 4:
+              _i++;
+              _context2.n = 2;
+              break;
+            case 5:
+              if (newJobs.length > 0) {
+                console.log("[JobHunt] Background batch added ".concat(newJobs.length, " more jobs"));
+                setEmailJobs(function (prev) {
+                  var merged = [].concat(newJobs, _toConsumableArray(prev.filter(function (ej) {
+                    return !newJobs.some(function (nj) {
+                      return nj.company === ej.company && nj.title === ej.title;
+                    });
+                  }))).slice(0, 100);
+                  ls.set(EMAIL_JOBS_KEY, merged);
+                  return merged;
+                });
+                scoreJobs(newJobs);
+              }
+              // Schedule next batch if more remain
+              if (cont.batchIndex < cont.batches.length) {
+                console.log("[JobHunt] Next background batch in 60s...");
+                timer = setTimeout(processBatch, 60000);
+              } else {
+                console.log("[JobHunt] All background batches complete!");
+                window._emailSyncContinuation = null;
+              }
+            case 6:
+              return _context2.a(2);
+          }
+        }, _callee2);
+      }));
+      return _processBatch.apply(this, arguments);
+    }
+    var poller = setInterval(function () {
+      if (window._emailSyncContinuation && window._emailSyncContinuation.batchIndex === 0) {
+        clearInterval(poller);
+        timer = setTimeout(processBatch, 60000); // first continuation after 60s
+      }
+    }, 5000);
+    return function () {
+      clearInterval(poller);
+      if (timer) clearTimeout(timer);
+    };
+  }, []);
   function handleSignIn() {
     if (!tokenClient) {
       showToast("Google auth loading, try again", "error");
@@ -1181,37 +1330,37 @@ function App() {
   }
 
   // ── Load board jobs ────────────────────────────────────────────────────────
-  var loadBoardJobs = useCallback(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-    var all, _iterator3, _step3, p, _t2, _t3, _t4;
-    return _regenerator().w(function (_context2) {
-      while (1) switch (_context2.n) {
+  var loadBoardJobs = useCallback(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
+    var all, _iterator5, _step5, p, _t2, _t3, _t4;
+    return _regenerator().w(function (_context3) {
+      while (1) switch (_context3.n) {
         case 0:
           setLoading(true);
           all = [];
           if (!selPlatforms.includes("yc")) {
-            _context2.n = 2;
+            _context3.n = 2;
             break;
           }
           _t2 = [];
           _t3 = _toConsumableArray(all);
           _t4 = _toConsumableArray;
-          _context2.n = 1;
+          _context3.n = 1;
           return fetchYCJobs();
         case 1:
-          all = _t2.concat.call(_t2, _t3, _t4(_context2.v));
+          all = _t2.concat.call(_t2, _t3, _t4(_context3.v));
         case 2:
-          _iterator3 = _createForOfIteratorHelper(PLATFORMS.filter(function (p) {
+          _iterator5 = _createForOfIteratorHelper(PLATFORMS.filter(function (p) {
             return p.id !== "yc";
           }));
           try {
-            for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-              p = _step3.value;
+            for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+              p = _step5.value;
               if (selPlatforms.includes(p.id)) all = [].concat(_toConsumableArray(all), _toConsumableArray(generateMockJobs(p.id)));
             }
           } catch (err) {
-            _iterator3.e(err);
+            _iterator5.e(err);
           } finally {
-            _iterator3.f();
+            _iterator5.f();
           }
           all = all.filter(function (j) {
             return j.remote || /bengaluru|bangalore/i.test(j.location);
@@ -1220,35 +1369,35 @@ function App() {
           setLoading(false);
           scoreJobs(all);
         case 3:
-          return _context2.a(2);
+          return _context3.a(2);
       }
-    }, _callee2);
+    }, _callee3);
   })), [selPlatforms]);
   function scoreJobs(_x15) {
     return _scoreJobs.apply(this, arguments);
   }
   function _scoreJobs() {
-    _scoreJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3(list) {
+    _scoreJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(list) {
       var _loop, i;
-      return _regenerator().w(function (_context4) {
-        while (1) switch (_context4.n) {
+      return _regenerator().w(function (_context5) {
+        while (1) switch (_context5.n) {
           case 0:
             if (!(!profile.skills && !profile.summary)) {
-              _context4.n = 1;
+              _context5.n = 1;
               break;
             }
-            return _context4.a(2);
+            return _context5.a(2);
           case 1:
             _loop = /*#__PURE__*/_regenerator().m(function _loop() {
               var chunk, upd, results, apply;
-              return _regenerator().w(function (_context3) {
-                while (1) switch (_context3.n) {
+              return _regenerator().w(function (_context4) {
+                while (1) switch (_context4.n) {
                   case 0:
                     if (!(i > 0)) {
-                      _context3.n = 1;
+                      _context4.n = 1;
                       break;
                     }
-                    _context3.n = 1;
+                    _context4.n = 1;
                     return sleep(4000);
                   case 1:
                     // avoid rate limiting between scoring batches
@@ -1268,12 +1417,12 @@ function App() {
                     setEmailJobs(function (p) {
                       return upd(p);
                     });
-                    _context3.n = 2;
+                    _context4.n = 2;
                     return Promise.all(chunk.map(function (j) {
                       return scoreJob(j, profile);
                     }));
                   case 2:
-                    results = _context3.v;
+                    results = _context4.v;
                     apply = function apply(arr) {
                       return arr.map(function (j) {
                         var idx = chunk.findIndex(function (c) {
@@ -1294,25 +1443,25 @@ function App() {
                       return apply(p);
                     });
                   case 3:
-                    return _context3.a(2);
+                    return _context4.a(2);
                 }
               }, _loop);
             });
             i = 0;
           case 2:
             if (!(i < Math.min(list.length, 24))) {
-              _context4.n = 4;
+              _context5.n = 4;
               break;
             }
-            return _context4.d(_regeneratorValues(_loop()), 3);
+            return _context5.d(_regeneratorValues(_loop()), 3);
           case 3:
             i += 3;
-            _context4.n = 2;
+            _context5.n = 2;
             break;
           case 4:
-            return _context4.a(2);
+            return _context5.a(2);
         }
-      }, _callee3);
+      }, _callee4);
     }));
     return _scoreJobs.apply(this, arguments);
   }
@@ -1325,13 +1474,13 @@ function App() {
     return _handleGmailSync.apply(this, arguments);
   }
   function _handleGmailSync() {
-    _handleGmailSync = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4() {
-      var _tokenClient, fetched, merged, _t5;
-      return _regenerator().w(function (_context5) {
-        while (1) switch (_context5.p = _context5.n) {
+    _handleGmailSync = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5() {
+      var _tokenClient, fetched, _window$_emailSyncCon, remaining, bgMsg, merged, _t5;
+      return _regenerator().w(function (_context6) {
+        while (1) switch (_context6.p = _context6.n) {
           case 0:
             if (currentAccessToken) {
-              _context5.n = 1;
+              _context6.n = 1;
               break;
             }
             if (!gmailUser) {
@@ -1345,18 +1494,20 @@ function App() {
                 prompt: ""
               });
             }
-            return _context5.a(2);
+            return _context6.a(2);
           case 1:
             setFetchingEmail(true);
-            _context5.p = 2;
-            _context5.n = 3;
+            _context6.p = 2;
+            _context6.n = 3;
             return fetchJobEmailsFromGmail(currentAccessToken);
           case 3:
-            fetched = _context5.v;
+            fetched = _context6.v;
             if (!fetched.length) {
               showToast("No job emails matched — check console (F12) for details", "info");
             } else {
-              showToast("Found ".concat(fetched.length, " job").concat(fetched.length > 1 ? "s" : "", " from your emails! \uD83D\uDCE7"));
+              remaining = ((_window$_emailSyncCon = window._emailSyncContinuation) === null || _window$_emailSyncCon === void 0 || (_window$_emailSyncCon = _window$_emailSyncCon.batches) === null || _window$_emailSyncCon === void 0 ? void 0 : _window$_emailSyncCon.length) || 0;
+              bgMsg = remaining > 0 ? " (+".concat(remaining, " more batches loading in background)") : "";
+              showToast("Found ".concat(fetched.length, " job").concat(fetched.length > 1 ? "s" : "", " from emails! \uD83D\uDCE7").concat(bgMsg));
             }
             merged = [].concat(_toConsumableArray(fetched), _toConsumableArray(emailJobs.filter(function (ej) {
               return !fetched.some(function (fj) {
@@ -1366,11 +1517,11 @@ function App() {
             setEmailJobs(merged);
             ls.set(EMAIL_JOBS_KEY, merged);
             scoreJobs(fetched);
-            _context5.n = 5;
+            _context6.n = 5;
             break;
           case 4:
-            _context5.p = 4;
-            _t5 = _context5.v;
+            _context6.p = 4;
+            _t5 = _context6.v;
             console.error("[JobHunt] Sync error:", _t5);
             if (_t5.message.includes("Token expired") || _t5.message.includes("401") || _t5.message.includes("sign in")) {
               currentAccessToken = null;
@@ -1382,9 +1533,9 @@ function App() {
           case 5:
             setFetchingEmail(false);
           case 6:
-            return _context5.a(2);
+            return _context6.a(2);
         }
-      }, _callee4, null, [[2, 4]]);
+      }, _callee5, null, [[2, 4]]);
     }));
     return _handleGmailSync.apply(this, arguments);
   }
@@ -1415,11 +1566,11 @@ function App() {
     return _startApplyFlow.apply(this, arguments);
   }
   function _startApplyFlow() {
-    _startApplyFlow = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(job) {
+    _startApplyFlow = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(job) {
       var _PLATFORMS$find;
       var hasCL, _yield$Promise$all, _yield$Promise$all2, cv, cl, missing, saved, _t6;
-      return _regenerator().w(function (_context6) {
-        while (1) switch (_context6.p = _context6.n) {
+      return _regenerator().w(function (_context7) {
+        while (1) switch (_context7.p = _context7.n) {
           case 0:
             hasCL = (_PLATFORMS$find = PLATFORMS.find(function (p) {
               return p.id === job.platform;
@@ -1433,8 +1584,8 @@ function App() {
               extraAnswers: {},
               activeDoc: "cv"
             });
-            _context6.p = 1;
-            _context6.n = 2;
+            _context7.p = 1;
+            _context7.n = 2;
             return Promise.all([generateCuratedCV(job, profile)["catch"](function (e) {
               return "Error: ".concat(e.message);
             }), hasCL ? generateCoverLetter(job, profile)["catch"](function (e) {
@@ -1443,7 +1594,7 @@ function App() {
               return [];
             })]);
           case 2:
-            _yield$Promise$all = _context6.v;
+            _yield$Promise$all = _context7.v;
             _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 3);
             cv = _yield$Promise$all2[0];
             cl = _yield$Promise$all2[1];
@@ -1460,11 +1611,11 @@ function App() {
                 extraAnswers: saved
               });
             });
-            _context6.n = 4;
+            _context7.n = 4;
             break;
           case 3:
-            _context6.p = 3;
-            _t6 = _context6.v;
+            _context7.p = 3;
+            _t6 = _context7.v;
             setApplyFlow(function (prev) {
               return _objectSpread(_objectSpread({}, prev), {}, {
                 stage: "review",
@@ -1475,9 +1626,9 @@ function App() {
               });
             });
           case 4:
-            return _context6.a(2);
+            return _context7.a(2);
         }
-      }, _callee5, null, [[1, 3]]);
+      }, _callee6, null, [[1, 3]]);
     }));
     return _startApplyFlow.apply(this, arguments);
   }
