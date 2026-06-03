@@ -94,20 +94,17 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
 var _React = React,
   useState = _React.useState,
   useEffect = _React.useEffect,
-  useCallback = _React.useCallback,
-  useRef = _React.useRef;
+  useCallback = _React.useCallback;
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 var GOOGLE_CLIENT_ID = "103943542867-uvt5or72jgohd4st2e30lt7c8bg57una.apps.googleusercontent.com";
 var GEMINI_API_KEY = "AIzaSyB5vqcNa2I8_qMIhYUqbVdhFTOWOW644FY";
-var GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=".concat(GEMINI_API_KEY);
 var GMAIL_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 var STORAGE_KEY = "jobhunt_profile_v3";
 var EMAIL_JOBS_KEY = "jobhunt_email_jobs_v2";
 var APPLIED_KEY = "jobhunt_applied_v1";
-var EXTRA_ANSWERS_KEY = "jobhunt_answers_v1";
 var PLATFORMS = [{
   id: "yc",
   name: "YC Jobs",
@@ -158,7 +155,7 @@ var PLATFORMS = [{
   senders: ["info@hirist.com", "info@jobfeed.hirist.com", "info@hirist.tech", "no-reply@hirist.tech", "hirist.com", "hirist.tech"]
 }];
 var DEFAULT_CV = "{name}\n{title}  |  {email}  |  {phone}  |  {location}\n\nPROFESSIONAL SUMMARY\n{summary}\n\nSKILLS\n{skills}\n\nWORK EXPERIENCE\n{experience}\n\nEDUCATION\n{education}";
-var DEFAULT_CL = "{date}\n\nHiring Manager\n{company}\n\nDear Hiring Manager,\n\nI am writing to express my strong interest in the {title} position at {company}. With {years_experience} years of experience in software engineering and expertise in {top_skills}, I am confident I can make an immediate impact on your team.\n\n{why_company_paragraph}\n\n{key_achievements_paragraph}\n\nI would welcome the opportunity to discuss how my background aligns with your goals.\n\nWarm regards,\n{name}\n{email}  |  {phone}";
+var DEFAULT_CL = "{date}\n\nHiring Manager\n{company}\n\nDear Hiring Manager,\n\nI am writing to express my strong interest in the {title} position at {company}.\n\n{why_company_paragraph}\n\nWarm regards,\n{name}";
 var BLANK_PROFILE = {
   name: "",
   email: "",
@@ -203,19 +200,12 @@ var ls = {
     try {
       localStorage.setItem(k, JSON.stringify(v));
     } catch (_unused2) {}
-  },
-  del: function del(k) {
-    try {
-      localStorage.removeItem(k);
-    } catch (_unused3) {}
   }
 };
 function loadProfile() {
   var p = ls.get(STORAGE_KEY);
   if (!p) return BLANK_PROFILE;
-  return _objectSpread(_objectSpread(_objectSpread({}, BLANK_PROFILE), p), {}, {
-    coverLetterTemplate: p.coverLetterTemplate || DEFAULT_CL
-  });
+  return _objectSpread(_objectSpread({}, BLANK_PROFILE), p);
 }
 function loadApplied() {
   return new Set(ls.get(APPLIED_KEY, []));
@@ -225,266 +215,53 @@ function markApplied(id) {
   s.add(id);
   ls.set(APPLIED_KEY, _toConsumableArray(s));
 }
-function loadExtraAnswers() {
-  return ls.get(EXTRA_ANSWERS_KEY, {});
-}
-function saveExtraAnswers(a) {
-  ls.set(EXTRA_ANSWERS_KEY, a);
-}
 
-// ─── Gemini ───────────────────────────────────────────────────────────────────
-var sleep = function sleep(ms) {
-  return new Promise(function (r) {
-    return setTimeout(r, ms);
-  });
-};
-function callGemini(_x) {
-  return _callGemini.apply(this, arguments);
-}
-function _callGemini() {
-  _callGemini = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(prompt) {
-    var jsonMode,
-      retries,
-      attempt,
-      _d$candidates,
-      res,
-      wait,
-      e,
-      d,
-      _args8 = arguments;
-    return _regenerator().w(function (_context8) {
-      while (1) switch (_context8.n) {
-        case 0:
-          jsonMode = _args8.length > 1 && _args8[1] !== undefined ? _args8[1] : false;
-          retries = _args8.length > 2 && _args8[2] !== undefined ? _args8[2] : 6;
-          attempt = 0;
-        case 1:
-          if (!(attempt < retries)) {
-            _context8.n = 9;
-            break;
-          }
-          _context8.n = 2;
-          return fetch(GEMINI_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              contents: [{
-                parts: [{
-                  text: prompt
-                }]
-              }],
-              generationConfig: _objectSpread({
-                temperature: 0.3,
-                maxOutputTokens: 2048
-              }, jsonMode ? {
-                responseMimeType: "application/json"
-              } : {})
-            })
-          });
-        case 2:
-          res = _context8.v;
-          if (!(res.status === 429)) {
-            _context8.n = 4;
-            break;
-          }
-          wait = attempt === 0 ? 15000 : (attempt + 1) * 15000; // 15s, 30s, 45s, 60s...
-          console.log("[JobHunt] Gemini rate limited (attempt ".concat(attempt + 1, "/").concat(retries, "), waiting ").concat(wait / 1000, "s..."));
-          _context8.n = 3;
-          return sleep(wait);
-        case 3:
-          return _context8.a(3, 8);
-        case 4:
-          if (res.ok) {
-            _context8.n = 6;
-            break;
-          }
-          _context8.n = 5;
-          return res.text();
-        case 5:
-          e = _context8.v;
-          throw new Error("Gemini error: ".concat(e));
-        case 6:
-          _context8.n = 7;
-          return res.json();
-        case 7:
-          d = _context8.v;
-          return _context8.a(2, ((_d$candidates = d.candidates) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates[0]) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates.content) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates.parts) === null || _d$candidates === void 0 || (_d$candidates = _d$candidates[0]) === null || _d$candidates === void 0 ? void 0 : _d$candidates.text) || "");
-        case 8:
-          attempt++;
-          _context8.n = 1;
-          break;
-        case 9:
-          throw new Error("Gemini rate limit exceeded — try again in a minute");
-        case 10:
-          return _context8.a(2);
-      }
-    }, _callee7);
-  }));
-  return _callGemini.apply(this, arguments);
-}
-function scoreJob(_x2, _x3) {
-  return _scoreJob.apply(this, arguments);
-}
-function _scoreJob() {
-  _scoreJob = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(job, profile) {
-    var t, _t7;
-    return _regenerator().w(function (_context9) {
-      while (1) switch (_context9.p = _context9.n) {
-        case 0:
-          if (!(!profile.skills && !profile.summary)) {
-            _context9.n = 1;
-            break;
-          }
-          return _context9.a(2, {
-            score: 0,
-            reasons: ["Complete your profile first"]
-          });
-        case 1:
-          _context9.p = 1;
-          _context9.n = 2;
-          return callGemini("You are a recruiter. Score candidate-job match 0-100.\nCANDIDATE: ".concat(profile.title, ", Skills: ").concat(profile.skills, ", Summary: ").concat((profile.summary || "").slice(0, 300), "\nJOB: ").concat(job.title, " at ").concat(job.company, ". ").concat((job.description || "").slice(0, 400), "\nRespond ONLY with JSON: {\"score\":<number>,\"reasons\":[\"r1\",\"r2\",\"r3\"]}"), true);
-        case 2:
-          t = _context9.v;
-          return _context9.a(2, JSON.parse(t.replace(/```json|```/g, "").trim()));
-        case 3:
-          _context9.p = 3;
-          _t7 = _context9.v;
-          return _context9.a(2, {
-            score: 50,
-            reasons: ["Match score unavailable"]
-          });
-      }
-    }, _callee8, null, [[1, 3]]);
-  }));
-  return _scoreJob.apply(this, arguments);
-}
-function generateCuratedCV(_x4, _x5) {
+// ─── DISABLED — will re-enable after email sync is confirmed working ──────────
+function generateCuratedCV(_x, _x2) {
   return _generateCuratedCV.apply(this, arguments);
 }
 function _generateCuratedCV() {
-  _generateCuratedCV = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9(job, profile) {
-    return _regenerator().w(function (_context0) {
-      while (1) switch (_context0.n) {
+  _generateCuratedCV = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(job, profile) {
+    return _regenerator().w(function (_context4) {
+      while (1) switch (_context4.n) {
         case 0:
-          _context0.n = 1;
-          return callGemini("You are a professional resume writer. Tailor this CV for the job using ONLY the candidate's real info.\nPROFILE: ".concat(JSON.stringify(_objectSpread(_objectSpread({}, profile), {}, {
-            cvTemplate: undefined,
-            coverLetterTemplate: undefined
-          })), "\nJOB: ").concat(job.title, " at ").concat(job.company, "\nDESCRIPTION: ").concat((job.description || "").slice(0, 700), "\nTEMPLATE:\n").concat(profile.cvTemplate, "\nReturn ONLY the filled CV text."));
-        case 1:
-          return _context0.a(2, _context0.v);
+          return _context4.a(2, "CV generation coming soon");
       }
-    }, _callee9);
+    }, _callee4);
   }));
   return _generateCuratedCV.apply(this, arguments);
 }
-function generateCoverLetter(_x6, _x7) {
+function generateCoverLetter(_x3, _x4) {
   return _generateCoverLetter.apply(this, arguments);
 }
 function _generateCoverLetter() {
-  _generateCoverLetter = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(job, profile) {
-    var today;
-    return _regenerator().w(function (_context1) {
-      while (1) switch (_context1.n) {
+  _generateCoverLetter = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(job, profile) {
+    return _regenerator().w(function (_context5) {
+      while (1) switch (_context5.n) {
         case 0:
-          today = new Date().toLocaleDateString("en-IN", {
-            day: "numeric",
-            month: "long",
-            year: "numeric"
-          });
-          _context1.n = 1;
-          return callGemini("Write a compelling personalised cover letter using ONLY the candidate's real data.\nPROFILE: ".concat(JSON.stringify(_objectSpread(_objectSpread({}, profile), {}, {
-            cvTemplate: undefined,
-            coverLetterTemplate: undefined
-          })), "\nJOB: ").concat(job.title, " at ").concat(job.company, "\nDESCRIPTION: ").concat((job.description || "").slice(0, 700), "\nTEMPLATE:\n").concat(profile.coverLetterTemplate, "\n{date}=").concat(today, ", {years_experience}=estimate from experience, {top_skills}=3-4 most relevant skills, {why_company_paragraph}=2-3 specific sentences, {key_achievements_paragraph}=2-3 achievements.\nReturn ONLY the final cover letter."));
-        case 1:
-          return _context1.a(2, _context1.v);
+          return _context5.a(2, null);
       }
-    }, _callee0);
+    }, _callee5);
   }));
   return _generateCoverLetter.apply(this, arguments);
 }
-function detectMissingFields(_x8, _x9, _x0) {
+function detectMissingFields(_x5, _x6, _x7) {
   return _detectMissingFields.apply(this, arguments);
-}
+} // ─── Gmail OAuth ──────────────────────────────────────────────────────────────
 function _detectMissingFields() {
-  _detectMissingFields = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(job, profile, extraAnswers) {
-    var known, t, _t8;
-    return _regenerator().w(function (_context10) {
-      while (1) switch (_context10.p = _context10.n) {
+  _detectMissingFields = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(job, p, extras) {
+    return _regenerator().w(function (_context6) {
+      while (1) switch (_context6.n) {
         case 0:
-          known = {
-            name: profile.name,
-            email: profile.email,
-            phone: profile.phone,
-            location: profile.location,
-            title: profile.title,
-            linkedin: profile.linkedin,
-            github: profile.github,
-            portfolio: profile.portfolio,
-            noticePeriod: profile.noticePeriod,
-            expectedCTC: profile.expectedCTC,
-            currentCTC: profile.currentCTC,
-            skills: profile.skills
-          };
-          _context10.p = 1;
-          _context10.n = 2;
-          return callGemini("Job application form analysis.\nJOB: ".concat(job.title, " at ").concat(job.company, ". ").concat((job.description || "").slice(0, 400), "\nKNOWN FIELDS: ").concat(JSON.stringify(known), "\nALREADY ANSWERED: ").concat(Object.keys(extraAnswers || {}).join(", ") || "none", "\nReturn ONLY a JSON array of missing fields: [{\"field\":\"name\",\"question\":\"Question?\",\"type\":\"text|number|select\",\"options\":[]}]\nMax 5 fields. If nothing missing return []."), true);
-        case 2:
-          t = _context10.v;
-          return _context10.a(2, JSON.parse(t.replace(/```json|```/g, "").trim()));
-        case 3:
-          _context10.p = 3;
-          _t8 = _context10.v;
-          return _context10.a(2, []);
+          return _context6.a(2, []);
       }
-    }, _callee1, null, [[1, 3]]);
+    }, _callee6);
   }));
   return _detectMissingFields.apply(this, arguments);
-}
-function parseEmailJobs(_x1, _x10) {
-  return _parseEmailJobs.apply(this, arguments);
-} // ─── Gmail OAuth — clean implementation ───────────────────────────────────────
-// NO localStorage token caching — always use tokenClient for fresh tokens
-// This avoids all 401/expired token issues
-function _parseEmailJobs() {
-  _parseEmailJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10(emailBodies, platformId) {
-    var _PLATFORMS$find3;
-    var name, t, clean, parsed, _t9;
-    return _regenerator().w(function (_context11) {
-      while (1) switch (_context11.p = _context11.n) {
-        case 0:
-          name = ((_PLATFORMS$find3 = PLATFORMS.find(function (p) {
-            return p.id === platformId;
-          })) === null || _PLATFORMS$find3 === void 0 ? void 0 : _PLATFORMS$find3.name) || platformId;
-          _context11.p = 1;
-          console.log("[JobHunt] Parsing ".concat(name, ", body length: ").concat(emailBodies.length, " chars"));
-          console.log("[JobHunt] Body preview: ".concat(emailBodies.slice(0, 400)));
-          _context11.n = 2;
-          return callGemini("Extract ALL job listings from these ".concat(name, " job alert emails.\nReturn a JSON array: [{\"title\":string,\"company\":string,\"location\":string,\"remote\":boolean,\"url\":string,\"description\":string,\"salary\":string|null}]\n- remote=true only if explicitly mentioned\n- url = direct job application link (not a redirect/tracking link if possible)\n- description = 2-3 sentence summary of the role\n- Extract EVERY job mentioned, even if just a title and company\nIf no jobs found return [].\nEMAIL CONTENT:\n").concat(emailBodies.slice(0, 6000), "\nRespond ONLY with a valid JSON array. No markdown, no explanation."), true);
-        case 2:
-          t = _context11.v;
-          console.log("[JobHunt] Gemini response for ".concat(name, ":"), t.slice(0, 600));
-          clean = t.replace(/```json|```/g, "").trim();
-          parsed = JSON.parse(clean);
-          console.log("[JobHunt] Successfully parsed ".concat(parsed.length, " jobs from ").concat(name));
-          return _context11.a(2, parsed);
-        case 3:
-          _context11.p = 3;
-          _t9 = _context11.v;
-          console.error("[JobHunt] parseEmailJobs FAILED for ".concat(name, ":"), _t9.message);
-          return _context11.a(2, []);
-      }
-    }, _callee10, null, [[1, 3]]);
-  }));
-  return _parseEmailJobs.apply(this, arguments);
 }
 var tokenClient = null;
-var currentAccessToken = null; // in-memory only, never persisted
-var emailSyncInProgress = false; // pause scoring while syncing emails
-
+var currentAccessToken = null;
+var emailSyncInProgress = false;
 function initGoogleAuth(onSignedIn) {
   var _tryInit = function tryInit() {
     var _window$google;
@@ -509,7 +286,6 @@ function initGoogleAuth(onSignedIn) {
                 return _context.a(2);
               case 1:
                 currentAccessToken = resp.access_token;
-                // Get user info
                 _context.p = 2;
                 _context.n = 3;
                 return fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
@@ -548,58 +324,58 @@ function initGoogleAuth(onSignedIn) {
             }
           }, _callee, null, [[2, 7]]);
         }));
-        function callback(_x11) {
+        function callback(_x8) {
           return _callback.apply(this, arguments);
         }
         return callback;
       }(),
       error_callback: function error_callback(err) {
-        console.error("[JobHunt] token client error:", err);
+        return console.error("[JobHunt] token client error:", err);
       }
     });
   };
   _tryInit();
 }
-function gmailFetch(_x12, _x13) {
+function gmailFetch(_x9, _x0) {
   return _gmailFetch.apply(this, arguments);
 }
 function _gmailFetch() {
-  _gmailFetch = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11(path, token) {
+  _gmailFetch = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(path, token) {
     var res;
-    return _regenerator().w(function (_context12) {
-      while (1) switch (_context12.n) {
+    return _regenerator().w(function (_context7) {
+      while (1) switch (_context7.n) {
         case 0:
-          _context12.n = 1;
+          _context7.n = 1;
           return fetch("https://gmail.googleapis.com/gmail/v1".concat(path), {
             headers: {
               Authorization: "Bearer ".concat(token)
             }
           });
         case 1:
-          res = _context12.v;
+          res = _context7.v;
           if (!(res.status === 401)) {
-            _context12.n = 2;
+            _context7.n = 2;
             break;
           }
           currentAccessToken = null;
           throw new Error("Token expired — please sign in again");
         case 2:
           if (res.ok) {
-            _context12.n = 3;
+            _context7.n = 3;
             break;
           }
           throw new Error("Gmail API error ".concat(res.status));
         case 3:
-          return _context12.a(2, res.json());
+          return _context7.a(2, res.json());
       }
-    }, _callee11);
+    }, _callee7);
   }));
   return _gmailFetch.apply(this, arguments);
 }
 function b64decode(str) {
   try {
     return decodeURIComponent(escape(atob(str.replace(/-/g, "+").replace(/_/g, "/"))));
-  } catch (_unused4) {
+  } catch (_unused3) {
     return "";
   }
 }
@@ -638,39 +414,234 @@ function extractBody(payload) {
   if ((_payload$body2 = payload.body) !== null && _payload$body2 !== void 0 && _payload$body2.data) return b64decode(payload.body.data);
   return "";
 }
-function fetchJobEmailsFromGmail(_x14) {
+
+// ─── Manual email parsers — zero Gemini calls ─────────────────────────────────
+
+function parseLinkedInEmail(body) {
+  var jobs = [];
+  var lines = body.split("\n").map(function (l) {
+    return l.trim();
+  });
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    // Find LinkedIn job URLs
+    var urlMatch = line.match(/https?:\/\/(?:www\.)?linkedin\.com\/(?:comm\/)?jobs\/view\/(\d+)[^\s]*/i);
+    if (!urlMatch) continue;
+    var url = urlMatch[0];
+    // Title, company, location are the 3 lines immediately before the URL line
+    var title = lines[i - 3] || lines[i - 2] || "";
+    var company = lines[i - 2] || "";
+    var location = lines[i - 1] || "";
+    if (!title || title.length < 3 || /^https?/i.test(title)) continue;
+    jobs.push({
+      title: title,
+      company: company,
+      location: location,
+      remote: /remote/i.test(location) || /remote/i.test(title),
+      url: url,
+      description: "".concat(title, " at ").concat(company, " \u2014 ").concat(location),
+      salary: null
+    });
+  }
+  // Deduplicate by URL
+  var seen = new Set();
+  var unique = jobs.filter(function (j) {
+    if (seen.has(j.url)) return false;
+    seen.add(j.url);
+    return true;
+  });
+  console.log("[JobHunt] LinkedIn parser: ".concat(unique.length, " jobs from ").concat(lines.length, " lines"));
+  return unique;
+}
+function parseHiristEmail(body) {
+  var jobs = [];
+  var lines = body.split("\n").map(function (l) {
+    return l.trim();
+  });
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var urlMatch = line.match(/https?:\/\/(?:www\.)?hirist\.(?:tech|com)\/[^\s]*/i) || line.match(/https?:\/\/[^\s]*hirist[^\s]*/i);
+    if (!urlMatch) continue;
+    var url = urlMatch[0];
+    // Look back up to 6 lines for title and company
+    var prev = lines.slice(Math.max(0, i - 6), i).filter(function (l) {
+      return l.length > 1 && !/^https?/i.test(l);
+    });
+    var title = prev[prev.length - 2] || prev[0] || "Software Engineer";
+    var company = prev[prev.length - 1] || "";
+    // Location/salary often in a line with | separators
+    var infoLine = lines.slice(Math.max(0, i - 6), i).find(function (l) {
+      return l.includes("|");
+    }) || "";
+    var location = infoLine.split("|")[0].trim() || "Bengaluru";
+    var salaryMatch = infoLine.match(/\d+[-–]\d+\s*(?:lpa|l|lakhs?)/i);
+    if (title.length > 2) {
+      jobs.push({
+        title: title,
+        company: company,
+        location: location,
+        remote: /remote/i.test(body.slice(Math.max(0, body.indexOf(url) - 300), body.indexOf(url))),
+        url: url,
+        description: "".concat(title, " at ").concat(company, " \u2014 ").concat(location),
+        salary: salaryMatch ? salaryMatch[0] : null
+      });
+    }
+  }
+  var seen = new Set();
+  var unique = jobs.filter(function (j) {
+    if (seen.has(j.url)) return false;
+    seen.add(j.url);
+    return true;
+  });
+  console.log("[JobHunt] Hirist parser: ".concat(unique.length, " jobs"));
+  return unique;
+}
+function parseIndeedEmail(body) {
+  var jobs = [];
+  var lines = body.split("\n").map(function (l) {
+    return l.trim();
+  });
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var urlMatch = line.match(/https?:\/\/(?:in\.)?indeed\.com\/(?:rc\/clk|viewjob|jobs\/)[^\s]*/i);
+    if (!urlMatch) continue;
+    var url = urlMatch[0];
+    var prev = lines.slice(Math.max(0, i - 5), i).filter(function (l) {
+      return l.length > 1 && !/^https?/i.test(l);
+    });
+    var title = prev[prev.length - 3] || prev[0] || "Software Engineer";
+    var company = prev[prev.length - 2] || "";
+    var location = prev[prev.length - 1] || "";
+    if (title.length > 2) {
+      jobs.push({
+        title: title,
+        company: company,
+        location: location,
+        remote: /remote/i.test(location),
+        url: url,
+        description: "".concat(title, " at ").concat(company),
+        salary: null
+      });
+    }
+  }
+  var seen = new Set();
+  var unique = jobs.filter(function (j) {
+    if (seen.has(j.url)) return false;
+    seen.add(j.url);
+    return true;
+  });
+  console.log("[JobHunt] Indeed parser: ".concat(unique.length, " jobs"));
+  return unique;
+}
+function parseNaukriEmail(body) {
+  var jobs = [];
+  var lines = body.split("\n").map(function (l) {
+    return l.trim();
+  });
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var urlMatch = line.match(/https?:\/\/[^\s]*naukri\.com\/[^\s]*/i);
+    if (!urlMatch) continue;
+    var url = urlMatch[0];
+    if (/unsubscribe|setting|logo|help|naukri\.com\/?$/i.test(url)) continue;
+    var prev = lines.slice(Math.max(0, i - 4), i).filter(function (l) {
+      return l.length > 1 && !/^https?/i.test(l);
+    });
+    var title = prev[prev.length - 3] || prev[0] || "Software Engineer";
+    var company = prev[prev.length - 2] || "";
+    var location = prev[prev.length - 1] || "";
+    if (title.length > 2 && !/^(http|www|naukri)/i.test(title)) {
+      jobs.push({
+        title: title,
+        company: company,
+        location: location,
+        remote: /remote/i.test(location),
+        url: url,
+        description: "".concat(title, " at ").concat(company),
+        salary: null
+      });
+    }
+  }
+  var seen = new Set();
+  var unique = jobs.filter(function (j) {
+    if (seen.has(j.url)) return false;
+    seen.add(j.url);
+    return true;
+  });
+  console.log("[JobHunt] Naukri parser: ".concat(unique.length, " jobs"));
+  return unique;
+}
+function parseInstahyreEmail(body) {
+  var jobs = [];
+  var lines = body.split("\n").map(function (l) {
+    return l.trim();
+  });
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var urlMatch = line.match(/https?:\/\/[^\s]*instahyre\.com\/[^\s]*/i);
+    if (!urlMatch) continue;
+    var url = urlMatch[0];
+    if (/unsubscribe|setting|logo/i.test(url)) continue;
+    var prev = lines.slice(Math.max(0, i - 4), i).filter(function (l) {
+      return l.length > 1 && !/^https?/i.test(l);
+    });
+    var title = prev[prev.length - 2] || prev[0] || "Software Engineer";
+    var company = prev[prev.length - 1] || "";
+    if (title.length > 2) {
+      jobs.push({
+        title: title,
+        company: company,
+        location: "Bengaluru",
+        remote: false,
+        url: url,
+        description: "".concat(title, " at ").concat(company),
+        salary: null
+      });
+    }
+  }
+  var seen = new Set();
+  var unique = jobs.filter(function (j) {
+    if (seen.has(j.url)) return false;
+    seen.add(j.url);
+    return true;
+  });
+  console.log("[JobHunt] Instahyre parser: ".concat(unique.length, " jobs"));
+  return unique;
+}
+function parseEmailJobs(emailBodies, platformId) {
+  console.log("[JobHunt] Parsing ".concat(platformId, ", body: ").concat(emailBodies.length, " chars"));
+  try {
+    switch (platformId) {
+      case "linkedin":
+        return parseLinkedInEmail(emailBodies);
+      case "hirist":
+        return parseHiristEmail(emailBodies);
+      case "indeed":
+        return parseIndeedEmail(emailBodies);
+      case "naukri":
+        return parseNaukriEmail(emailBodies);
+      case "instahyre":
+        return parseInstahyreEmail(emailBodies);
+      default:
+        return [];
+    }
+  } catch (e) {
+    console.error("[JobHunt] Parser error for ".concat(platformId, ":"), e.message);
+    return [];
+  }
+}
+
+// ─── fetchJobEmailsFromGmail ──────────────────────────────────────────────────
+function fetchJobEmailsFromGmail(_x1) {
   return _fetchJobEmailsFromGmail.apply(this, arguments);
 } // ─── YC Jobs ──────────────────────────────────────────────────────────────────
 function _fetchJobEmailsFromGmail() {
-  _fetchJobEmailsFromGmail = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee12(token) {
+  _fetchJobEmailsFromGmail = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(token) {
     var _listRes$messages, _listRes$messages2;
-    var allSenders, senderQ, subjectQ, query, listRes, messages, grouped, _iterator6, _step6, _loop2, allChunks, _i2, _Object$entries2, _Object$entries2$_i, platformId, bodies, _iterator7, _step7, body, BATCH_SIZE, firstBatch, remainingBatches, i, chunkToJob, firstGrouped, _iterator8, _step8, _step8$value, _platformId3, jobs, _i3, _Object$entries3, _Object$entries3$_i, _platformId2, _bodies, _i4, _chunk, parsed, _iterator9, _step9, j, job, _t0;
-    return _regenerator().w(function (_context14) {
-      while (1) switch (_context14.p = _context14.n) {
+    var allSenders, senderQ, subjectQ, query, listRes, messages, grouped, _iterator4, _step4, _loop, jobs, _i, _Object$entries, _Object$entries$_i, platformId, bodies, parsed, _iterator5, _step5, j, remote, loc, _t6, _t7;
+    return _regenerator().w(function (_context9) {
+      while (1) switch (_context9.p = _context9.n) {
         case 0:
-          chunkToJob = function _chunkToJob(j, platformId) {
-            var remote = j.remote || /remote/i.test(j.location || "");
-            var loc = j.location || (remote ? "Remote" : "");
-            if (!remote && !/bengaluru|bangalore/i.test(loc)) return null;
-            return {
-              id: "email_".concat(platformId, "_").concat(Date.now(), "_").concat(Math.random().toString(36).slice(2, 7)),
-              platform: platformId,
-              source: "email",
-              title: j.title || "Software Engineer",
-              company: j.company || "Unknown",
-              description: j.description || "",
-              salary: j.salary || null,
-              remote: remote,
-              location: remote ? "Remote – Worldwide" : loc,
-              country: detectCountry(j.location || ""),
-              url: j.url || platformUrl(platformId, j.title, j.company),
-              score: null,
-              reasons: [],
-              scoreLoading: false,
-              postedAt: "from email"
-            };
-          };
-          // Build query from all known senders
           allSenders = PLATFORMS.filter(function (p) {
             return p.emailSource;
           }).flatMap(function (p) {
@@ -682,27 +653,27 @@ function _fetchJobEmailsFromGmail() {
           subjectQ = "subject:(job OR jobs OR opening OR alert OR recommendation) (linkedin OR naukri OR indeed OR instahyre OR hirist)";
           query = "(".concat(senderQ, " OR ").concat(subjectQ, ") newer_than:14d");
           console.log("[JobHunt] Gmail query:", query);
-          _context14.n = 1;
+          _context9.n = 1;
           return gmailFetch("/users/me/messages?q=".concat(encodeURIComponent(query), "&maxResults=60"), token);
         case 1:
-          listRes = _context14.v;
-          console.log("[JobHunt] Gmail list result:", ((_listRes$messages = listRes.messages) === null || _listRes$messages === void 0 ? void 0 : _listRes$messages.length) || 0, "messages, error:", listRes.error || "none");
+          listRes = _context9.v;
+          console.log("[JobHunt] Messages found:", ((_listRes$messages = listRes.messages) === null || _listRes$messages === void 0 ? void 0 : _listRes$messages.length) || 0, listRes.error || "");
           if ((_listRes$messages2 = listRes.messages) !== null && _listRes$messages2 !== void 0 && _listRes$messages2.length) {
-            _context14.n = 2;
+            _context9.n = 2;
             break;
           }
-          return _context14.a(2, []);
+          return _context9.a(2, []);
         case 2:
-          _context14.n = 3;
+          _context9.n = 3;
           return Promise.all(listRes.messages.map(function (m) {
             return gmailFetch("/users/me/messages/".concat(m.id, "?format=full"), token)["catch"](function (e) {
-              console.warn("fetch msg failed", e);
+              console.warn("fetch msg failed", m.id, e);
               return null;
             });
           }));
         case 3:
-          messages = _context14.v;
-          // Log every email for debugging
+          messages = _context9.v;
+          // Log every email
           messages.filter(Boolean).forEach(function (m, i) {
             var _m$payload, _m$payload2;
             var from = ((_m$payload = m.payload) === null || _m$payload === void 0 || (_m$payload = _m$payload.headers) === null || _m$payload === void 0 || (_m$payload = _m$payload.find(function (h) {
@@ -716,15 +687,15 @@ function _fetchJobEmailsFromGmail() {
 
           // Group by platform
           grouped = {};
-          _iterator6 = _createForOfIteratorHelper(messages.filter(Boolean));
-          _context14.p = 4;
-          _loop2 = /*#__PURE__*/_regenerator().m(function _loop2() {
+          _iterator4 = _createForOfIteratorHelper(messages.filter(Boolean));
+          _context9.p = 4;
+          _loop = /*#__PURE__*/_regenerator().m(function _loop() {
             var _msg$payload, _msg$payload2;
             var msg, fromH, subjH, fromLow, subjLow, body, platform;
-            return _regenerator().w(function (_context13) {
-              while (1) switch (_context13.n) {
+            return _regenerator().w(function (_context8) {
+              while (1) switch (_context8.n) {
                 case 0:
-                  msg = _step6.value;
+                  msg = _step4.value;
                   fromH = ((_msg$payload = msg.payload) === null || _msg$payload === void 0 || (_msg$payload = _msg$payload.headers) === null || _msg$payload === void 0 || (_msg$payload = _msg$payload.find(function (h) {
                     return h.name.toLowerCase() === "from";
                   })) === null || _msg$payload === void 0 ? void 0 : _msg$payload.value) || "";
@@ -736,165 +707,123 @@ function _fetchJobEmailsFromGmail() {
                   body = extractBody(msg.payload);
                   platform = PLATFORMS.find(function (p) {
                     if (!p.emailSource) return false;
-                    // Match by any sender string appearing in the from header
                     if (p.senders.some(function (s) {
                       return fromLow.includes(s.toLowerCase());
                     })) return true;
-                    // Fallback: platform id appears in subject
                     if (subjLow.includes(p.id)) return true;
                     return false;
                   });
-                  console.log("[JobHunt] \"".concat(fromH, "\" -> platform: ").concat((platform === null || platform === void 0 ? void 0 : platform.id) || "NO MATCH"));
+                  console.log("[JobHunt] \"".concat(fromH, "\" -> ").concat((platform === null || platform === void 0 ? void 0 : platform.id) || "NO MATCH"));
                   if (platform) {
-                    _context13.n = 1;
+                    _context8.n = 1;
                     break;
                   }
-                  return _context13.a(2, 1);
+                  return _context8.a(2, 1);
                 case 1:
                   if (!grouped[platform.id]) grouped[platform.id] = [];
-                  grouped[platform.id].push("SUBJECT: ".concat(subjH, "\n").concat(body));
+                  grouped[platform.id].push(body);
                 case 2:
-                  return _context13.a(2);
+                  return _context8.a(2);
               }
-            }, _loop2);
+            }, _loop);
           });
-          _iterator6.s();
+          _iterator4.s();
         case 5:
-          if ((_step6 = _iterator6.n()).done) {
-            _context14.n = 8;
+          if ((_step4 = _iterator4.n()).done) {
+            _context9.n = 8;
             break;
           }
-          return _context14.d(_regeneratorValues(_loop2()), 6);
+          return _context9.d(_regeneratorValues(_loop()), 6);
         case 6:
-          if (!_context14.v) {
-            _context14.n = 7;
+          if (!_context9.v) {
+            _context9.n = 7;
             break;
           }
-          return _context14.a(3, 7);
+          return _context9.a(3, 7);
         case 7:
-          _context14.n = 5;
+          _context9.n = 5;
           break;
         case 8:
-          _context14.n = 10;
+          _context9.n = 10;
           break;
         case 9:
-          _context14.p = 9;
-          _t0 = _context14.v;
-          _iterator6.e(_t0);
+          _context9.p = 9;
+          _t6 = _context9.v;
+          _iterator4.e(_t6);
         case 10:
-          _context14.p = 10;
-          _iterator6.f();
-          return _context14.f(10);
+          _context9.p = 10;
+          _iterator4.f();
+          return _context9.f(10);
         case 11:
-          console.log("[JobHunt] Grouped platforms:", Object.keys(grouped));
+          console.log("[JobHunt] Grouped:", Object.keys(grouped));
 
-          // Split all email bodies into flat list of {platformId, body} chunks (1 email per chunk)
-          allChunks = [];
-          for (_i2 = 0, _Object$entries2 = Object.entries(grouped); _i2 < _Object$entries2.length; _i2++) {
-            _Object$entries2$_i = _slicedToArray(_Object$entries2[_i2], 2), platformId = _Object$entries2$_i[0], bodies = _Object$entries2$_i[1];
-            _iterator7 = _createForOfIteratorHelper(bodies);
-            try {
-              for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
-                body = _step7.value;
-                allChunks.push({
-                  platformId: platformId,
-                  body: body
-                });
-              }
-            } catch (err) {
-              _iterator7.e(err);
-            } finally {
-              _iterator7.f();
-            }
-          }
-          console.log("[JobHunt] Total email chunks to parse: ".concat(allChunks.length));
-
-          // Process first batch of 15 immediately, return those jobs right away
-          // Remaining batches run in background via window._emailSyncContinuation
-          BATCH_SIZE = 15;
-          firstBatch = allChunks.slice(0, BATCH_SIZE);
-          remainingBatches = [];
-          for (i = BATCH_SIZE; i < allChunks.length; i += BATCH_SIZE) {
-            remainingBatches.push(allChunks.slice(i, i + BATCH_SIZE));
-          }
-          // Group first batch by platform and parse
-          // Group first batch by platform, then sub-chunk into groups of 3 emails each
-          // This avoids sending huge 100KB+ blobs to Gemini at once
-          firstGrouped = {};
-          _iterator8 = _createForOfIteratorHelper(firstBatch);
-          try {
-            for (_iterator8.s(); !(_step8 = _iterator8.n()).done;) {
-              _step8$value = _step8.value, _platformId3 = _step8$value.platformId, body = _step8$value.body;
-              if (!firstGrouped[_platformId3]) firstGrouped[_platformId3] = [];
-              firstGrouped[_platformId3].push(body);
-            }
-          } catch (err) {
-            _iterator8.e(err);
-          } finally {
-            _iterator8.f();
-          }
+          // Parse all groups — instant, no API calls
           jobs = [];
-          _i3 = 0, _Object$entries3 = Object.entries(firstGrouped);
+          _i = 0, _Object$entries = Object.entries(grouped);
         case 12:
-          if (!(_i3 < _Object$entries3.length)) {
-            _context14.n = 18;
+          if (!(_i < _Object$entries.length)) {
+            _context9.n = 21;
             break;
           }
-          _Object$entries3$_i = _slicedToArray(_Object$entries3[_i3], 2), _platformId2 = _Object$entries3$_i[0], _bodies = _Object$entries3$_i[1];
-          _i4 = 0;
-        case 13:
-          if (!(_i4 < _bodies.length)) {
-            _context14.n = 17;
-            break;
-          }
-          if (!(_i4 > 0)) {
-            _context14.n = 14;
-            break;
-          }
-          _context14.n = 14;
-          return sleep(10000);
+          _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2), platformId = _Object$entries$_i[0], bodies = _Object$entries$_i[1];
+          parsed = parseEmailJobs(bodies.join("\n\n---\n\n"), platformId);
+          _iterator5 = _createForOfIteratorHelper(parsed);
+          _context9.p = 13;
+          _iterator5.s();
         case 14:
-          _chunk = _bodies.slice(_i4, _i4 + 3);
-          _context14.n = 15;
-          return parseEmailJobs(_chunk.join("\n\n---\n\n"), _platformId2);
-        case 15:
-          parsed = _context14.v;
-          _iterator9 = _createForOfIteratorHelper(parsed);
-          try {
-            for (_iterator9.s(); !(_step9 = _iterator9.n()).done;) {
-              j = _step9.value;
-              job = chunkToJob(j, _platformId2);
-              if (job) jobs.push(job);
-            }
-          } catch (err) {
-            _iterator9.e(err);
-          } finally {
-            _iterator9.f();
+          if ((_step5 = _iterator5.n()).done) {
+            _context9.n = 17;
+            break;
           }
+          j = _step5.value;
+          remote = j.remote || /remote/i.test(j.location || "");
+          loc = j.location || (remote ? "Remote" : "");
+          if (!(!remote && !/bengaluru|bangalore/i.test(loc))) {
+            _context9.n = 15;
+            break;
+          }
+          return _context9.a(3, 16);
+        case 15:
+          jobs.push({
+            id: "email_".concat(platformId, "_").concat(Date.now(), "_").concat(Math.random().toString(36).slice(2, 7)),
+            platform: platformId,
+            source: "email",
+            title: j.title || "Software Engineer",
+            company: j.company || "Unknown",
+            description: j.description || "",
+            salary: j.salary || null,
+            remote: remote,
+            location: remote ? "Remote – Worldwide" : loc,
+            country: detectCountry(j.location || ""),
+            url: j.url || platformUrl(platformId, j.title, j.company),
+            score: null,
+            reasons: [],
+            scoreLoading: false,
+            postedAt: "from email"
+          });
         case 16:
-          _i4 += 3;
-          _context14.n = 13;
+          _context9.n = 14;
           break;
         case 17:
-          _i3++;
-          _context14.n = 12;
+          _context9.n = 19;
           break;
         case 18:
-          console.log("[JobHunt] First batch: ".concat(jobs.length, " jobs. ").concat(remainingBatches.length, " more batches queued."));
-
-          // Schedule remaining batches in background (60s apart, uses window callback set by App)
-          if (remainingBatches.length > 0) {
-            window._emailSyncContinuation = {
-              batches: remainingBatches,
-              batchIndex: 0,
-              chunkToJob: chunkToJob,
-              token: token
-            };
-            console.log("[JobHunt] Background sync queued: ".concat(remainingBatches.length, " batches \xD7 60s"));
-          }
-          return _context14.a(2, jobs);
+          _context9.p = 18;
+          _t7 = _context9.v;
+          _iterator5.e(_t7);
+        case 19:
+          _context9.p = 19;
+          _iterator5.f();
+          return _context9.f(19);
+        case 20:
+          _i++;
+          _context9.n = 12;
+          break;
+        case 21:
+          console.log("[JobHunt] Total email jobs:", jobs.length);
+          return _context9.a(2, jobs);
       }
-    }, _callee12, null, [[4, 9, 10, 11]]);
+    }, _callee8, null, [[13, 18, 19, 20], [4, 9, 10, 11]]);
   }));
   return _fetchJobEmailsFromGmail.apply(this, arguments);
 }
@@ -902,37 +831,37 @@ function fetchYCJobs() {
   return _fetchYCJobs.apply(this, arguments);
 }
 function _fetchYCJobs() {
-  _fetchYCJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee13() {
-    var u, stories, thread, comments, _t1;
-    return _regenerator().w(function (_context15) {
-      while (1) switch (_context15.p = _context15.n) {
+  _fetchYCJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
+    var u, stories, thread, comments, _t8;
+    return _regenerator().w(function (_context0) {
+      while (1) switch (_context0.p = _context0.n) {
         case 0:
-          _context15.p = 0;
-          _context15.n = 1;
+          _context0.p = 0;
+          _context0.n = 1;
           return fetch("https://hacker-news.firebaseio.com/v0/user/whoishiring.json").then(function (r) {
             return r.json();
           });
         case 1:
-          u = _context15.v;
-          _context15.n = 2;
+          u = _context0.v;
+          _context0.n = 2;
           return Promise.all((u.submitted || []).slice(0, 5).map(function (id) {
             return fetch("https://hacker-news.firebaseio.com/v0/item/".concat(id, ".json")).then(function (r) {
               return r.json();
             });
           }));
         case 2:
-          stories = _context15.v;
+          stories = _context0.v;
           thread = stories.find(function (s) {
             var _s$title, _s$title2;
             return ((_s$title = s.title) === null || _s$title === void 0 ? void 0 : _s$title.includes("Who is Hiring")) && ((_s$title2 = s.title) === null || _s$title2 === void 0 ? void 0 : _s$title2.includes("2025"));
           });
           if (thread) {
-            _context15.n = 3;
+            _context0.n = 3;
             break;
           }
-          return _context15.a(2, []);
+          return _context0.a(2, []);
         case 3:
-          _context15.n = 4;
+          _context0.n = 4;
           return Promise.all((thread.kids || []).slice(0, 60).map(function (id) {
             return fetch("https://hacker-news.firebaseio.com/v0/item/".concat(id, ".json")).then(function (r) {
               return r.json();
@@ -941,8 +870,8 @@ function _fetchYCJobs() {
             });
           }));
         case 4:
-          comments = _context15.v;
-          return _context15.a(2, comments.filter(Boolean).filter(function (c) {
+          comments = _context0.v;
+          return _context0.a(2, comments.filter(Boolean).filter(function (c) {
             var _c$text;
             return ((_c$text = c.text) === null || _c$text === void 0 ? void 0 : _c$text.length) > 100;
           }).map(function (c) {
@@ -971,11 +900,11 @@ function _fetchYCJobs() {
             };
           }));
         case 5:
-          _context15.p = 5;
-          _t1 = _context15.v;
-          return _context15.a(2, []);
+          _context0.p = 5;
+          _t8 = _context0.v;
+          return _context0.a(2, []);
       }
-    }, _callee13, null, [[0, 5]]);
+    }, _callee9, null, [[0, 5]]);
   }));
   return _fetchYCJobs.apply(this, arguments);
 }
@@ -1011,7 +940,7 @@ function generateMockJobs(platform) {
       source: "mock",
       title: titles[i % titles.length],
       company: platCos[i % platCos.length],
-      description: "We are looking for a ".concat(titles[i % titles.length], " with 6-10 years of experience.\nTech stack: ").concat(stacks[i % stacks.length], ".\nResponsibilities: Design scalable systems, lead engineering teams, mentor engineers, code reviews.\nRequirements: Strong DSA & system design, distributed systems experience.\nBenefits: Competitive salary, ESOP, health insurance, learning budget."),
+      description: "".concat(titles[i % titles.length], " with 6-10 years experience.\nStack: ").concat(stacks[i % stacks.length], ".\nBengaluru or Remote."),
       remote: remote,
       salary: null,
       location: remote ? "Remote – Worldwide" : "Bengaluru, India",
@@ -1030,13 +959,13 @@ function platformUrl(platform, title, company) {
   return {
     linkedin: "https://www.linkedin.com/jobs/search/?keywords=".concat(q, "&location=Bengaluru&f_WT=2%2C1&f_TPR=r604800"),
     indeed: "https://in.indeed.com/jobs?q=".concat(q, "&l=Bengaluru&fromage=14"),
-    naukri: "https://www.naukri.com/".concat(t.toLowerCase().replace(/\s+/g, "-"), "-jobs-in-bangalore?title=").concat(encodeURIComponent(t)),
+    naukri: "https://www.naukri.com/".concat(t.toLowerCase().replace(/\s+/g, "-"), "-jobs-in-bangalore"),
     instahyre: "https://www.instahyre.com/search-jobs/?q=".concat(encodeURIComponent(t)),
     hirist: "https://www.hirist.tech/search?q=".concat(encodeURIComponent(t))
   }[platform] || "#";
 }
 
-// ─── UI atoms ─────────────────────────────────────────────────────────────────
+// ─── UI Atoms ─────────────────────────────────────────────────────────────────
 function ScoreBadge(_ref) {
   var score = _ref.score,
     loading = _ref.loading;
@@ -1048,16 +977,8 @@ function ScoreBadge(_ref) {
       background: "#1e293b",
       color: "#94a3b8"
     }
-  }, "scoring\u2026");
-  if (score === null) return /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 11,
-      padding: "2px 8px",
-      borderRadius: 20,
-      background: "#1e293b",
-      color: "#64748b"
-    }
-  }, "\u2013");
+  }, "\u2026");
+  if (score === null) return null;
   var c = score >= 75 ? "#22c55e" : score >= 50 ? "#f59e0b" : "#ef4444";
   return /*#__PURE__*/React.createElement("span", {
     style: {
@@ -1108,8 +1029,6 @@ function SourceBadge(_ref2) {
   }, "SAMPLE");
   return null;
 }
-
-// ─── Sec and F components — defined at top level to avoid focus loss ──────────
 function Sec(_ref3) {
   var title = _ref3.title,
     children = _ref3.children;
@@ -1148,7 +1067,7 @@ function F(_ref4) {
   })) : /*#__PURE__*/React.createElement("input", props));
 }
 
-// ─── MAIN APP ─────────────────────────────────────────────────────────────────
+// ─── Main App ─────────────────────────────────────────────────────────────────
 function App() {
   var _useState = useState("jobs"),
     _useState2 = _slicedToArray(_useState, 2),
@@ -1202,16 +1121,12 @@ function App() {
     setApplied = _useState22[1];
   var _useState23 = useState(null),
     _useState24 = _slicedToArray(_useState23, 2),
-    applyFlow = _useState24[0],
-    setApplyFlow = _useState24[1];
+    toast = _useState24[0],
+    setToast = _useState24[1];
   var _useState25 = useState(null),
     _useState26 = _slicedToArray(_useState25, 2),
-    toast = _useState26[0],
-    setToast = _useState26[1];
-  var _useState27 = useState(null),
-    _useState28 = _slicedToArray(_useState27, 2),
-    gmailUser = _useState28[0],
-    setGmailUser = _useState28[1];
+    gmailUser = _useState26[0],
+    setGmailUser = _useState26[1];
   function showToast(msg) {
     var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "success";
     setToast({
@@ -1223,140 +1138,16 @@ function App() {
     }, 4000);
   }
 
-  // ── Auth — no token caching, always fresh ──────────────────────────────────
+  // Auth
   useEffect(function () {
     initGoogleAuth(function (user, token) {
       currentAccessToken = token;
       setGmailUser(user);
     });
   }, []);
-
-  // ── Background batch processor — runs remaining email batches 60s apart ──
-  useEffect(function () {
-    var timer = null;
-    function processBatch() {
-      return _processBatch.apply(this, arguments);
-    } // Check every 5s if a continuation was queued
-    function _processBatch() {
-      _processBatch = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-        var cont, batch, grouped, _iterator3, _step3, _step3$value, _platformId, body, newJobs, _i, _Object$entries, _Object$entries$_i, platformId, bodies, i, chunk, parsed, _iterator4, _step4, j, job;
-        return _regenerator().w(function (_context2) {
-          while (1) switch (_context2.n) {
-            case 0:
-              cont = window._emailSyncContinuation;
-              if (!(!cont || cont.batchIndex >= cont.batches.length)) {
-                _context2.n = 1;
-                break;
-              }
-              return _context2.a(2);
-            case 1:
-              batch = cont.batches[cont.batchIndex];
-              cont.batchIndex++;
-              console.log("[JobHunt] Background batch ".concat(cont.batchIndex, "/").concat(cont.batches.length, " starting..."));
-              // Group by platform
-              grouped = {};
-              _iterator3 = _createForOfIteratorHelper(batch);
-              try {
-                for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-                  _step3$value = _step3.value, _platformId = _step3$value.platformId, body = _step3$value.body;
-                  if (!grouped[_platformId]) grouped[_platformId] = [];
-                  grouped[_platformId].push(body);
-                }
-              } catch (err) {
-                _iterator3.e(err);
-              } finally {
-                _iterator3.f();
-              }
-              newJobs = [];
-              _i = 0, _Object$entries = Object.entries(grouped);
-            case 2:
-              if (!(_i < _Object$entries.length)) {
-                _context2.n = 8;
-                break;
-              }
-              _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2), platformId = _Object$entries$_i[0], bodies = _Object$entries$_i[1];
-              i = 0;
-            case 3:
-              if (!(i < bodies.length)) {
-                _context2.n = 7;
-                break;
-              }
-              if (!(i > 0)) {
-                _context2.n = 4;
-                break;
-              }
-              _context2.n = 4;
-              return sleep(10000);
-            case 4:
-              chunk = bodies.slice(i, i + 3);
-              _context2.n = 5;
-              return parseEmailJobs(chunk.join("\n\n---\n\n"), platformId);
-            case 5:
-              parsed = _context2.v;
-              _iterator4 = _createForOfIteratorHelper(parsed);
-              try {
-                for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-                  j = _step4.value;
-                  job = cont.chunkToJob(j, platformId);
-                  if (job) newJobs.push(job);
-                }
-              } catch (err) {
-                _iterator4.e(err);
-              } finally {
-                _iterator4.f();
-              }
-            case 6:
-              i += 3;
-              _context2.n = 3;
-              break;
-            case 7:
-              _i++;
-              _context2.n = 2;
-              break;
-            case 8:
-              if (newJobs.length > 0) {
-                console.log("[JobHunt] Background batch added ".concat(newJobs.length, " more jobs"));
-                setEmailJobs(function (prev) {
-                  var merged = [].concat(newJobs, _toConsumableArray(prev.filter(function (ej) {
-                    return !newJobs.some(function (nj) {
-                      return nj.company === ej.company && nj.title === ej.title;
-                    });
-                  }))).slice(0, 100);
-                  ls.set(EMAIL_JOBS_KEY, merged);
-                  return merged;
-                });
-                scoreJobs(newJobs);
-              }
-              // Schedule next batch if more remain
-              if (cont.batchIndex < cont.batches.length) {
-                console.log("[JobHunt] Next background batch in 60s...");
-                timer = setTimeout(processBatch, 60000);
-              } else {
-                console.log("[JobHunt] All background batches complete!");
-                window._emailSyncContinuation = null;
-                emailSyncInProgress = false;
-              }
-            case 9:
-              return _context2.a(2);
-          }
-        }, _callee2);
-      }));
-      return _processBatch.apply(this, arguments);
-    }
-    var poller = setInterval(function () {
-      if (window._emailSyncContinuation && window._emailSyncContinuation.batchIndex === 0) {
-        clearInterval(poller);
-        timer = setTimeout(processBatch, 60000); // first continuation after 60s
-      }
-    }, 5000);
-    return function () {
-      clearInterval(poller);
-      if (timer) clearTimeout(timer);
-    };
-  }, []);
   function handleSignIn() {
     if (!tokenClient) {
-      showToast("Google auth loading, try again", "error");
+      showToast("Auth loading, try again", "error");
       return;
     }
     tokenClient.requestAccessToken({
@@ -1366,221 +1157,107 @@ function App() {
   function handleSignOut() {
     currentAccessToken = null;
     setGmailUser(null);
-    showToast("Signed out of Google");
+    showToast("Signed out");
   }
 
-  // ── Load board jobs ────────────────────────────────────────────────────────
-  var loadBoardJobs = useCallback(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
-    var all, _iterator5, _step5, p, _t2, _t3, _t4;
-    return _regenerator().w(function (_context3) {
-      while (1) switch (_context3.n) {
+  // Load board jobs
+  var loadBoardJobs = useCallback(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
+    var all, _iterator3, _step3, p, _t2, _t3, _t4;
+    return _regenerator().w(function (_context2) {
+      while (1) switch (_context2.n) {
         case 0:
           setLoading(true);
           all = [];
           if (!selPlatforms.includes("yc")) {
-            _context3.n = 2;
+            _context2.n = 2;
             break;
           }
           _t2 = [];
           _t3 = _toConsumableArray(all);
           _t4 = _toConsumableArray;
-          _context3.n = 1;
+          _context2.n = 1;
           return fetchYCJobs();
         case 1:
-          all = _t2.concat.call(_t2, _t3, _t4(_context3.v));
+          all = _t2.concat.call(_t2, _t3, _t4(_context2.v));
         case 2:
-          _iterator5 = _createForOfIteratorHelper(PLATFORMS.filter(function (p) {
+          _iterator3 = _createForOfIteratorHelper(PLATFORMS.filter(function (p) {
             return p.id !== "yc";
           }));
           try {
-            for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-              p = _step5.value;
+            for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+              p = _step3.value;
               if (selPlatforms.includes(p.id)) all = [].concat(_toConsumableArray(all), _toConsumableArray(generateMockJobs(p.id)));
             }
           } catch (err) {
-            _iterator5.e(err);
+            _iterator3.e(err);
           } finally {
-            _iterator5.f();
+            _iterator3.f();
           }
           all = all.filter(function (j) {
             return j.remote || /bengaluru|bangalore/i.test(j.location);
           });
           setJobs(all);
           setLoading(false);
-          scoreJobs(all);
         case 3:
-          return _context3.a(2);
+          return _context2.a(2);
       }
-    }, _callee3);
+    }, _callee2);
   })), [selPlatforms]);
-  function scoreJobs(_x15) {
-    return _scoreJobs.apply(this, arguments);
-  }
-  function _scoreJobs() {
-    _scoreJobs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(list) {
-      var _loop, i;
-      return _regenerator().w(function (_context5) {
-        while (1) switch (_context5.n) {
-          case 0:
-            if (!(!profile.skills && !profile.summary)) {
-              _context5.n = 1;
-              break;
-            }
-            return _context5.a(2);
-          case 1:
-            if (!emailSyncInProgress) {
-              _context5.n = 2;
-              break;
-            }
-            console.log("[JobHunt] Scoring paused — email sync in progress");
-            _context5.n = 2;
-            return new Promise(function (resolve) {
-              var check = setInterval(function () {
-                if (!emailSyncInProgress) {
-                  clearInterval(check);
-                  resolve();
-                }
-              }, 3000);
-            });
-          case 2:
-            _loop = /*#__PURE__*/_regenerator().m(function _loop() {
-              var chunk, upd, results, apply;
-              return _regenerator().w(function (_context4) {
-                while (1) switch (_context4.n) {
-                  case 0:
-                    if (!(i > 0)) {
-                      _context4.n = 1;
-                      break;
-                    }
-                    _context4.n = 1;
-                    return sleep(8000);
-                  case 1:
-                    // 8s between scoring batches
-                    chunk = list.slice(i, i + 3);
-                    upd = function upd(arr) {
-                      return arr.map(function (j) {
-                        return chunk.find(function (c) {
-                          return c.id === j.id;
-                        }) ? _objectSpread(_objectSpread({}, j), {}, {
-                          scoreLoading: true
-                        }) : j;
-                      });
-                    };
-                    setJobs(function (p) {
-                      return upd(p);
-                    });
-                    setEmailJobs(function (p) {
-                      return upd(p);
-                    });
-                    _context4.n = 2;
-                    return Promise.all(chunk.map(function (j) {
-                      return scoreJob(j, profile);
-                    }));
-                  case 2:
-                    results = _context4.v;
-                    apply = function apply(arr) {
-                      return arr.map(function (j) {
-                        var idx = chunk.findIndex(function (c) {
-                          return c.id === j.id;
-                        });
-                        if (idx === -1) return j;
-                        return _objectSpread(_objectSpread({}, j), {}, {
-                          score: results[idx].score,
-                          reasons: results[idx].reasons,
-                          scoreLoading: false
-                        });
-                      });
-                    };
-                    setJobs(function (p) {
-                      return apply(p);
-                    });
-                    setEmailJobs(function (p) {
-                      return apply(p);
-                    });
-                  case 3:
-                    return _context4.a(2);
-                }
-              }, _loop);
-            });
-            i = 0;
-          case 3:
-            if (!(i < Math.min(list.length, 24))) {
-              _context5.n = 5;
-              break;
-            }
-            return _context5.d(_regeneratorValues(_loop()), 4);
-          case 4:
-            i += 3;
-            _context5.n = 3;
-            break;
-          case 5:
-            return _context5.a(2);
-        }
-      }, _callee4);
-    }));
-    return _scoreJobs.apply(this, arguments);
-  }
   useEffect(function () {
     loadBoardJobs();
   }, []);
 
-  // ── Gmail sync ─────────────────────────────────────────────────────────────
+  // Gmail sync
   function handleGmailSync() {
     return _handleGmailSync.apply(this, arguments);
-  }
+  } // Apply — just opens URL for now
   function _handleGmailSync() {
-    _handleGmailSync = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5() {
-      var _tokenClient, fetched, _window$_emailSyncCon, remaining, bgMsg, merged, _t5;
-      return _regenerator().w(function (_context6) {
-        while (1) switch (_context6.p = _context6.n) {
+    _handleGmailSync = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
+      var _tokenClient, fetched, merged, _t5;
+      return _regenerator().w(function (_context3) {
+        while (1) switch (_context3.p = _context3.n) {
           case 0:
             if (currentAccessToken) {
-              _context6.n = 1;
+              _context3.n = 1;
               break;
             }
             if (!gmailUser) {
-              // Not signed in — trigger sign in, user must tap sync again after
               handleSignIn();
               showToast("Signing in… tap Sync again after Google prompt", "info");
             } else {
-              // Was signed in but token gone — re-auth silently
-              showToast("Refreshing auth… tap Sync again in a moment", "info");
+              showToast("Refreshing session… tap Sync again", "info");
               (_tokenClient = tokenClient) === null || _tokenClient === void 0 || _tokenClient.requestAccessToken({
                 prompt: ""
               });
             }
-            return _context6.a(2);
+            return _context3.a(2);
           case 1:
             setFetchingEmail(true);
             emailSyncInProgress = true;
-            _context6.p = 2;
-            _context6.n = 3;
+            _context3.p = 2;
+            _context3.n = 3;
             return fetchJobEmailsFromGmail(currentAccessToken);
           case 3:
-            fetched = _context6.v;
+            fetched = _context3.v;
             if (!fetched.length) {
-              showToast("No job emails matched — check console (F12) for details", "info");
+              showToast("No job emails matched — check console for details", "info");
             } else {
-              remaining = ((_window$_emailSyncCon = window._emailSyncContinuation) === null || _window$_emailSyncCon === void 0 || (_window$_emailSyncCon = _window$_emailSyncCon.batches) === null || _window$_emailSyncCon === void 0 ? void 0 : _window$_emailSyncCon.length) || 0;
-              bgMsg = remaining > 0 ? " (+".concat(remaining, " more batches loading in background)") : "";
-              showToast("Found ".concat(fetched.length, " job").concat(fetched.length > 1 ? "s" : "", " from emails! \uD83D\uDCE7").concat(bgMsg));
+              showToast("Found ".concat(fetched.length, " job").concat(fetched.length > 1 ? "s" : "", " from your emails! \uD83D\uDCE7"));
             }
             merged = [].concat(_toConsumableArray(fetched), _toConsumableArray(emailJobs.filter(function (ej) {
               return !fetched.some(function (fj) {
                 return fj.company === ej.company && fj.title === ej.title;
               });
-            }))).slice(0, 100);
+            }))).slice(0, 200);
             setEmailJobs(merged);
             ls.set(EMAIL_JOBS_KEY, merged);
-            emailSyncInProgress = false;
-            scoreJobs(fetched);
-            _context6.n = 5;
+            _context3.n = 5;
             break;
           case 4:
-            _context6.p = 4;
-            _t5 = _context6.v;
+            _context3.p = 4;
+            _t5 = _context3.v;
             console.error("[JobHunt] Sync error:", _t5);
-            if (_t5.message.includes("Token expired") || _t5.message.includes("401") || _t5.message.includes("sign in")) {
+            if (_t5.message.includes("Token expired") || _t5.message.includes("401")) {
               currentAccessToken = null;
               setGmailUser(null);
               showToast("Session expired — please sign in again", "error");
@@ -1591,11 +1268,17 @@ function App() {
             emailSyncInProgress = false;
             setFetchingEmail(false);
           case 6:
-            return _context6.a(2);
+            return _context3.a(2);
         }
-      }, _callee5, null, [[2, 4]]);
+      }, _callee3, null, [[2, 4]]);
     }));
     return _handleGmailSync.apply(this, arguments);
+  }
+  function handleApply(job) {
+    markApplied(job.id);
+    setApplied(loadApplied());
+    window.open(job.url, "_blank");
+    showToast("Opened ".concat(job.company));
   }
   var allVisibleJobs = [].concat(_toConsumableArray(emailJobs), _toConsumableArray(jobs)).filter(function (j, i, arr) {
     return arr.findIndex(function (x) {
@@ -1604,109 +1287,20 @@ function App() {
   }).filter(function (j) {
     return selPlatforms.includes(j.platform);
   }).filter(function (j) {
-    return j.score === null || j.score >= minScore;
-  }).filter(function (j) {
     return remoteFilter === "all" ? true : remoteFilter === "remote" ? j.remote : !j.remote;
   }).filter(function (j) {
     return sourceFilter === "all" ? true : sourceFilter === "email" ? j.source === "email" : j.source !== "email";
   }).sort(function (a, b) {
-    return (b.score || 0) - (a.score || 0);
+    // Email jobs first, then by date
+    if (a.source === "email" && b.source !== "email") return -1;
+    if (b.source === "email" && a.source !== "email") return 1;
+    return 0;
   });
   function handleSaveProfile(p) {
     setProfile(p);
     ls.set(STORAGE_KEY, p);
     showToast("Profile saved!");
     setTab("jobs");
-  }
-
-  // ── Apply flow ─────────────────────────────────────────────────────────────
-  function startApplyFlow(_x16) {
-    return _startApplyFlow.apply(this, arguments);
-  }
-  function _startApplyFlow() {
-    _startApplyFlow = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(job) {
-      var _PLATFORMS$find;
-      var hasCL, _yield$Promise$all, _yield$Promise$all2, cv, cl, missing, saved, _t6;
-      return _regenerator().w(function (_context7) {
-        while (1) switch (_context7.p = _context7.n) {
-          case 0:
-            hasCL = (_PLATFORMS$find = PLATFORMS.find(function (p) {
-              return p.id === job.platform;
-            })) === null || _PLATFORMS$find === void 0 ? void 0 : _PLATFORMS$find.coverLetter;
-            setApplyFlow({
-              stage: "generating",
-              job: job,
-              cv: null,
-              coverLetter: null,
-              missingFields: [],
-              extraAnswers: {},
-              activeDoc: "cv"
-            });
-            _context7.p = 1;
-            _context7.n = 2;
-            return Promise.all([generateCuratedCV(job, profile)["catch"](function (e) {
-              return "Error: ".concat(e.message);
-            }), hasCL ? generateCoverLetter(job, profile)["catch"](function (e) {
-              return "Error: ".concat(e.message);
-            }) : Promise.resolve(null), detectMissingFields(job, profile, loadExtraAnswers())["catch"](function () {
-              return [];
-            })]);
-          case 2:
-            _yield$Promise$all = _context7.v;
-            _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 3);
-            cv = _yield$Promise$all2[0];
-            cl = _yield$Promise$all2[1];
-            missing = _yield$Promise$all2[2];
-            saved = loadExtraAnswers();
-            setApplyFlow(function (prev) {
-              return _objectSpread(_objectSpread({}, prev), {}, {
-                stage: "review",
-                cv: cv,
-                coverLetter: cl,
-                missingFields: missing.filter(function (f) {
-                  return !saved[f.field];
-                }),
-                extraAnswers: saved
-              });
-            });
-            _context7.n = 4;
-            break;
-          case 3:
-            _context7.p = 3;
-            _t6 = _context7.v;
-            setApplyFlow(function (prev) {
-              return _objectSpread(_objectSpread({}, prev), {}, {
-                stage: "review",
-                cv: "Could not generate CV. Check your Gemini API key and profile.",
-                coverLetter: null,
-                missingFields: [],
-                extraAnswers: {}
-              });
-            });
-          case 4:
-            return _context7.a(2);
-        }
-      }, _callee6, null, [[1, 3]]);
-    }));
-    return _startApplyFlow.apply(this, arguments);
-  }
-  function handleApproveDocuments() {
-    if (applyFlow.missingFields.length > 0) setApplyFlow(function (p) {
-      return _objectSpread(_objectSpread({}, p), {}, {
-        stage: "missing_fields"
-      });
-    });else executeApply();
-  }
-  function handleMissingAnswersSubmit(answers) {
-    saveExtraAnswers(_objectSpread(_objectSpread({}, loadExtraAnswers()), answers));
-    executeApply();
-  }
-  function executeApply() {
-    markApplied(applyFlow.job.id);
-    setApplied(loadApplied());
-    window.open(applyFlow.job.url, "_blank");
-    setApplyFlow(null);
-    showToast("Opened ".concat(applyFlow.job.company, " \u2014 paste your docs to apply!"));
   }
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1715,7 +1309,7 @@ function App() {
       color: "#e2e8f0",
       fontFamily: "'DM Mono','Fira Code',monospace"
     }
-  }, /*#__PURE__*/React.createElement("style", null, "\n        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');\n        *{box-sizing:border-box;margin:0;padding:0;}\n        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0a1628}::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:3px}\n        .jcard{transition:all 0.2s;border:1px solid #1e293b;border-radius:10px;}\n        .jcard:active{transform:scale(0.99);}\n        .tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;}\n        .btn{cursor:pointer;border:none;font-family:inherit;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}\n        .btn:active{opacity:0.7;} .btn:disabled{opacity:0.4;cursor:not-allowed;}\n        input,textarea,select{background:#0a1628;border:1px solid #1e293b;color:#e2e8f0;font-family:inherit;font-size:16px;padding:10px 12px;border-radius:8px;width:100%;outline:none;-webkit-appearance:none;}\n        input:focus,textarea:focus,select:focus{border-color:#3b82f6;}\n        .pill{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid;user-select:none;-webkit-tap-highlight-color:transparent;}\n        .overlay{position:fixed;inset:0;background:#000000bb;z-index:100;display:flex;align-items:flex-end;justify-content:center;}\n        @media(min-width:600px){.overlay{align-items:center;padding:20px;}}\n        .modal{background:#0d1f38;border:1px solid #1e3a5f;border-radius:16px 16px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:20px 16px 40px;}\n        @media(min-width:600px){.modal{border-radius:12px;max-width:760px;padding:28px;}}\n        .dtab{padding:8px 16px;border-radius:8px 8px 0 0;font-size:13px;cursor:pointer;border:1px solid;font-family:inherit;}\n        .dtab.on{background:#061122;border-color:#1e3a5f;border-bottom-color:#061122;color:#e2e8f0;}\n        .dtab.off{background:transparent;border-color:transparent;color:#475569;}\n        .slider{-webkit-appearance:none;height:4px;border-radius:2px;background:linear-gradient(to right,#3b82f6 0%,#3b82f6 var(--val,0%),#1e293b var(--val,0%),#1e293b 100%);}\n        .slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#3b82f6;cursor:pointer;}\n        @keyframes spin{to{transform:rotate(360deg)}}\n        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}\n        @keyframes slideUp{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}\n        .fade{animation:fadeIn 0.25s ease;}\n        .modal{animation:slideUp 0.25s ease;}\n        .spin{animation:spin 1s linear infinite;display:inline-block;}\n        .sl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#475569;margin-bottom:6px;}\n        .applied-badge{font-size:9px;padding:2px 6px;border-radius:3px;background:#16532d22;color:#4ade80;border:1px solid #16532d44;font-weight:700;}\n        .google-btn{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;border:1px solid #1e293b;background:#0a1628;color:#e2e8f0;cursor:pointer;font-family:inherit;font-size:13px;-webkit-tap-highlight-color:transparent;}\n        .google-btn:active{background:#0f1f33;}\n      "), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("style", null, "\n        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');\n        *{box-sizing:border-box;margin:0;padding:0;}\n        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0a1628}::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:3px}\n        .jcard{transition:border-color 0.15s;border:1px solid #1e293b;border-radius:10px;}\n        .jcard:active{opacity:0.85;}\n        .tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;}\n        .btn{cursor:pointer;border:none;font-family:inherit;-webkit-tap-highlight-color:transparent;}\n        .btn:active{opacity:0.7;} .btn:disabled{opacity:0.4;cursor:not-allowed;}\n        input,textarea,select{background:#0a1628;border:1px solid #1e293b;color:#e2e8f0;font-family:inherit;font-size:16px;padding:10px 12px;border-radius:8px;width:100%;outline:none;-webkit-appearance:none;}\n        input:focus,textarea:focus,select:focus{border-color:#3b82f6;}\n        .pill{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid;user-select:none;-webkit-tap-highlight-color:transparent;}\n        .overlay{position:fixed;inset:0;background:#000000bb;z-index:100;display:flex;align-items:flex-end;}\n        .modal{background:#0d1f38;border:1px solid #1e3a5f;border-radius:16px 16px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:20px 16px 40px;}\n        @media(min-width:600px){.overlay{align-items:center;justify-content:center;padding:20px;} .modal{border-radius:12px;max-width:760px;padding:28px;}}\n        .slider{-webkit-appearance:none;height:4px;border-radius:2px;background:linear-gradient(to right,#3b82f6 0%,#3b82f6 var(--val,0%),#1e293b var(--val,0%),#1e293b 100%);}\n        .slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#3b82f6;cursor:pointer;}\n        @keyframes spin{to{transform:rotate(360deg)}}\n        @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}\n        .fade{animation:fadeIn 0.2s ease;}\n        .spin{animation:spin 1s linear infinite;display:inline-block;}\n        .sl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#475569;margin-bottom:6px;}\n        .applied-badge{font-size:9px;padding:2px 6px;border-radius:3px;background:#16532d22;color:#4ade80;border:1px solid #16532d44;font-weight:700;}\n        .google-btn{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;border:1px solid #1e293b;background:#0a1628;color:#e2e8f0;cursor:pointer;font-family:inherit;font-size:13px;-webkit-tap-highlight-color:transparent;}\n        .google-btn:active{background:#0f1f33;}\n      "), /*#__PURE__*/React.createElement("div", {
     style: {
       borderBottom: "1px solid #1e293b",
       background: "#040d1a",
@@ -1888,8 +1482,6 @@ function App() {
     jobs: allVisibleJobs,
     allJobs: [].concat(_toConsumableArray(emailJobs), _toConsumableArray(jobs)),
     loading: loading,
-    minScore: minScore,
-    setMinScore: setMinScore,
     selPlatforms: selPlatforms,
     setSelPlatforms: setSelPlatforms,
     remoteFilter: remoteFilter,
@@ -1899,39 +1491,12 @@ function App() {
     selectedJob: selectedJob,
     setSelectedJob: setSelectedJob,
     onRefresh: loadBoardJobs,
-    onApply: startApplyFlow,
+    onApply: handleApply,
     applied: applied
   }) : /*#__PURE__*/React.createElement(ProfileTab, {
     profile: profile,
     onSave: handleSaveProfile
-  })), applyFlow && /*#__PURE__*/React.createElement("div", {
-    className: "overlay",
-    onClick: function onClick(e) {
-      return e.target === e.currentTarget && setApplyFlow(null);
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "modal fade"
-  }, applyFlow.stage === "generating" && /*#__PURE__*/React.createElement(GeneratingStage, {
-    job: applyFlow.job
-  }), applyFlow.stage === "review" && /*#__PURE__*/React.createElement(ReviewStage, {
-    flow: applyFlow,
-    setFlow: setApplyFlow,
-    onApprove: handleApproveDocuments,
-    onClose: function onClose() {
-      return setApplyFlow(null);
-    },
-    showToast: showToast
-  }), applyFlow.stage === "missing_fields" && /*#__PURE__*/React.createElement(MissingFieldsStage, {
-    flow: applyFlow,
-    onSubmit: handleMissingAnswersSubmit,
-    onBack: function onBack() {
-      return setApplyFlow(function (p) {
-        return _objectSpread(_objectSpread({}, p), {}, {
-          stage: "review"
-        });
-      });
-    }
-  }))), toast && /*#__PURE__*/React.createElement("div", {
+  })), toast && /*#__PURE__*/React.createElement("div", {
     style: {
       position: "fixed",
       bottom: 24,
@@ -1950,382 +1515,25 @@ function App() {
   }, toast.msg));
 }
 
-// ─── Apply stages ─────────────────────────────────────────────────────────────
-function GeneratingStage(_ref6) {
-  var job = _ref6.job;
-  var _useState29 = useState(0),
-    _useState30 = _slicedToArray(_useState29, 2),
-    step = _useState30[0],
-    setStep = _useState30[1];
-  var steps = ["Tailoring CV with Gemini…", "Writing cover letter…", "Detecting missing fields…"];
-  useEffect(function () {
-    var t = setInterval(function () {
-      return setStep(function (p) {
-        return p < steps.length - 1 ? p + 1 : p;
-      });
-    }, 2800);
-    return function () {
-      return clearInterval(t);
-    };
-  }, []);
-  return /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: "center",
-      padding: "50px 20px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 40,
-      marginBottom: 16
-    },
-    className: "spin"
-  }, "\u2726"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: "'Syne',sans-serif",
-      fontWeight: 700,
-      fontSize: 18,
-      marginBottom: 8
-    }
-  }, "Preparing your application"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      color: "#64748b",
-      fontSize: 13,
-      marginBottom: 24
-    }
-  }, job.title, " @ ", job.company), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      flexDirection: "column",
-      gap: 8,
-      maxWidth: 300,
-      margin: "0 auto",
-      textAlign: "left"
-    }
-  }, steps.map(function (s, i) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: i,
-      style: {
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        fontSize: 12,
-        color: i <= step ? "#60a5fa" : "#334155"
-      }
-    }, /*#__PURE__*/React.createElement("span", null, i < step ? "✅" : i === step ? "⟳" : "○"), s);
-  })));
-}
-function ReviewStage(_ref7) {
-  var _PLATFORMS$find2;
-  var flow = _ref7.flow,
-    setFlow = _ref7.setFlow,
-    onApprove = _ref7.onApprove,
-    onClose = _ref7.onClose,
-    showToast = _ref7.showToast;
-  var job = flow.job,
-    cv = flow.cv,
-    coverLetter = flow.coverLetter,
-    activeDoc = flow.activeDoc;
-  var hasCL = (_PLATFORMS$find2 = PLATFORMS.find(function (p) {
-    return p.id === job.platform;
-  })) === null || _PLATFORMS$find2 === void 0 ? void 0 : _PLATFORMS$find2.coverLetter;
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-      marginBottom: 18
-    }
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: "'Syne',sans-serif",
-      fontWeight: 700,
-      fontSize: 18
-    }
-  }, "\u2728 Review Application"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      color: "#64748b",
-      fontSize: 12,
-      marginTop: 3
-    }
-  }, job.title, " @ ", job.company)), /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: onClose,
-    style: {
-      background: "#1e293b",
-      color: "#94a3b8",
-      padding: "4px 10px",
-      borderRadius: 6,
-      fontSize: 13
-    }
-  }, "\u2715")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      borderBottom: "1px solid #1e3a5f"
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "dtab btn ".concat(activeDoc === "cv" ? "on" : "off"),
-    onClick: function onClick() {
-      return setFlow(function (p) {
-        return _objectSpread(_objectSpread({}, p), {}, {
-          activeDoc: "cv"
-        });
-      });
-    }
-  }, "\uD83D\uDCC4 CV"), hasCL && /*#__PURE__*/React.createElement("button", {
-    className: "dtab btn ".concat(activeDoc === "cl" ? "on" : "off"),
-    onClick: function onClick() {
-      return setFlow(function (p) {
-        return _objectSpread(_objectSpread({}, p), {}, {
-          activeDoc: "cl"
-        });
-      });
-    }
-  }, "\u2709\uFE0F Cover Letter")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "#061122",
-      border: "1px solid #1e3a5f",
-      borderTop: "none",
-      borderRadius: "0 0 8px 8px",
-      padding: 14,
-      marginBottom: 14
-    }
-  }, activeDoc === "cv" ? /*#__PURE__*/React.createElement("textarea", {
-    value: cv || "",
-    onChange: function onChange(e) {
-      return setFlow(function (p) {
-        return _objectSpread(_objectSpread({}, p), {}, {
-          cv: e.target.value
-        });
-      });
-    },
-    style: {
-      width: "100%",
-      minHeight: 300,
-      fontFamily: "'DM Mono',monospace",
-      fontSize: 12,
-      lineHeight: 1.7,
-      resize: "vertical",
-      background: "transparent",
-      border: "none",
-      color: "#cbd5e1",
-      outline: "none",
-      padding: 0
-    }
-  }) : /*#__PURE__*/React.createElement("textarea", {
-    value: coverLetter || "",
-    onChange: function onChange(e) {
-      return setFlow(function (p) {
-        return _objectSpread(_objectSpread({}, p), {}, {
-          coverLetter: e.target.value
-        });
-      });
-    },
-    style: {
-      width: "100%",
-      minHeight: 300,
-      fontFamily: "'DM Mono',monospace",
-      fontSize: 12,
-      lineHeight: 1.7,
-      resize: "vertical",
-      background: "transparent",
-      border: "none",
-      color: "#cbd5e1",
-      outline: "none",
-      padding: 0
-    }
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8,
-      flexWrap: "wrap",
-      justifyContent: "space-between"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: function onClick() {
-      navigator.clipboard.writeText(cv || "");
-      showToast("CV copied!");
-    },
-    style: {
-      padding: "8px 12px",
-      background: "#1e293b",
-      color: "#94a3b8",
-      borderRadius: 8,
-      fontSize: 12
-    }
-  }, "\uD83D\uDCCB CV"), hasCL && /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: function onClick() {
-      navigator.clipboard.writeText(coverLetter || "");
-      showToast("Cover letter copied!");
-    },
-    style: {
-      padding: "8px 12px",
-      background: "#1e293b",
-      color: "#94a3b8",
-      borderRadius: 8,
-      fontSize: 12
-    }
-  }, "\uD83D\uDCCB Letter")), /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: onApprove,
-    style: {
-      padding: "9px 20px",
-      background: "linear-gradient(135deg,#2563eb,#7c3aed)",
-      color: "white",
-      borderRadius: 8,
-      fontSize: 13,
-      fontWeight: 700
-    }
-  }, "\u2705 Approve & Apply \u2192")));
-}
-function MissingFieldsStage(_ref8) {
-  var flow = _ref8.flow,
-    onSubmit = _ref8.onSubmit,
-    onBack = _ref8.onBack;
-  var job = flow.job,
-    missingFields = flow.missingFields,
-    extraAnswers = flow.extraAnswers;
-  var _useState31 = useState(extraAnswers || {}),
-    _useState32 = _slicedToArray(_useState31, 2),
-    answers = _useState32[0],
-    setAnswers = _useState32[1];
-  var allFilled = missingFields.every(function (f) {
-    return answers[f.field];
-  });
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-      marginBottom: 18
-    }
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: "'Syne',sans-serif",
-      fontWeight: 700,
-      fontSize: 18
-    }
-  }, "\u2753 A Few More Details"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      color: "#64748b",
-      fontSize: 12,
-      marginTop: 3
-    }
-  }, job.title, " @ ", job.company)), /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: onBack,
-    style: {
-      background: "#1e293b",
-      color: "#94a3b8",
-      padding: "4px 10px",
-      borderRadius: 6,
-      fontSize: 12
-    }
-  }, "\u2190 Back")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "10px 14px",
-      background: "#1a1000",
-      border: "1px solid #78350f44",
-      borderRadius: 8,
-      fontSize: 11,
-      color: "#fbbf24",
-      marginBottom: 16,
-      lineHeight: 1.6
-    }
-  }, "These fields weren't in your profile. Answers are saved for future applications."), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      flexDirection: "column",
-      gap: 14,
-      marginBottom: 20
-    }
-  }, missingFields.map(function (f) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: f.field
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "sl"
-    }, f.question), f.type === "select" ? /*#__PURE__*/React.createElement("select", {
-      value: answers[f.field] || "",
-      onChange: function onChange(e) {
-        return setAnswers(function (p) {
-          return _objectSpread(_objectSpread({}, p), {}, _defineProperty({}, f.field, e.target.value));
-        });
-      }
-    }, /*#__PURE__*/React.createElement("option", {
-      value: ""
-    }, "Select\u2026"), (f.options || []).map(function (o) {
-      return /*#__PURE__*/React.createElement("option", {
-        key: o,
-        value: o
-      }, o);
-    })) : /*#__PURE__*/React.createElement("input", {
-      type: f.type === "number" ? "number" : "text",
-      value: answers[f.field] || "",
-      onChange: function onChange(e) {
-        return setAnswers(function (p) {
-          return _objectSpread(_objectSpread({}, p), {}, _defineProperty({}, f.field, e.target.value));
-        });
-      },
-      placeholder: "Enter ".concat(f.field, "\u2026")
-    }));
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8,
-      justifyContent: "flex-end"
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: onBack,
-    style: {
-      padding: "8px 14px",
-      background: "#1e293b",
-      color: "#94a3b8",
-      borderRadius: 8,
-      fontSize: 13
-    }
-  }, "\u2190 Back"), /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: function onClick() {
-      return onSubmit(answers);
-    },
-    disabled: !allFilled,
-    style: {
-      padding: "9px 20px",
-      background: allFilled ? "linear-gradient(135deg,#2563eb,#7c3aed)" : "#1e293b",
-      color: "white",
-      borderRadius: 8,
-      fontSize: 13,
-      fontWeight: 700
-    }
-  }, "\uD83D\uDE80 Submit & Apply")));
-}
-
 // ─── Jobs Tab ─────────────────────────────────────────────────────────────────
-function JobsTab(_ref9) {
-  var _selectedJob$reasons;
-  var jobs = _ref9.jobs,
-    allJobs = _ref9.allJobs,
-    loading = _ref9.loading,
-    minScore = _ref9.minScore,
-    setMinScore = _ref9.setMinScore,
-    selPlatforms = _ref9.selPlatforms,
-    setSelPlatforms = _ref9.setSelPlatforms,
-    remoteFilter = _ref9.remoteFilter,
-    setRemoteFilter = _ref9.setRemoteFilter,
-    sourceFilter = _ref9.sourceFilter,
-    setSourceFilter = _ref9.setSourceFilter,
-    selectedJob = _ref9.selectedJob,
-    setSelectedJob = _ref9.setSelectedJob,
-    onRefresh = _ref9.onRefresh,
-    _onApply = _ref9.onApply,
-    applied = _ref9.applied;
+function JobsTab(_ref6) {
+  var jobs = _ref6.jobs,
+    allJobs = _ref6.allJobs,
+    loading = _ref6.loading,
+    selPlatforms = _ref6.selPlatforms,
+    setSelPlatforms = _ref6.setSelPlatforms,
+    remoteFilter = _ref6.remoteFilter,
+    setRemoteFilter = _ref6.setRemoteFilter,
+    sourceFilter = _ref6.sourceFilter,
+    setSourceFilter = _ref6.setSourceFilter,
+    selectedJob = _ref6.selectedJob,
+    setSelectedJob = _ref6.setSelectedJob,
+    onRefresh = _ref6.onRefresh,
+    _onApply = _ref6.onApply,
+    applied = _ref6.applied;
+  var emailCount = allJobs.filter(function (j) {
+    return j.source === "email";
+  }).length;
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#0a1628",
@@ -2381,15 +1589,7 @@ function JobsTab(_ref9) {
         padding: "1px 4px",
         borderRadius: 3
       }
-    }, "\uD83D\uDCE7"), p.coverLetter && /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 9,
-        background: "#7c3aed22",
-        color: "#a78bfa",
-        padding: "1px 4px",
-        borderRadius: 3
-      }
-    }, "CL"));
+    }, "\uD83D\uDCE7"));
   }))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
@@ -2403,10 +1603,10 @@ function JobsTab(_ref9) {
       display: "flex",
       gap: 5
     }
-  }, [["all", "All"], ["remote", "🌍 Remote"], ["office", "🏢 BLR"]].map(function (_ref0) {
-    var _ref1 = _slicedToArray(_ref0, 2),
-      v = _ref1[0],
-      l = _ref1[1];
+  }, [["all", "All"], ["remote", "🌍 Remote"], ["office", "🏢 BLR"]].map(function (_ref7) {
+    var _ref8 = _slicedToArray(_ref7, 2),
+      v = _ref8[0],
+      l = _ref8[1];
     return /*#__PURE__*/React.createElement("span", {
       key: v,
       className: "pill",
@@ -2426,10 +1626,10 @@ function JobsTab(_ref9) {
       display: "flex",
       gap: 5
     }
-  }, [["all", "All"], ["email", "📧 Email"], ["board", "🔍 Board"]].map(function (_ref10) {
-    var _ref11 = _slicedToArray(_ref10, 2),
-      v = _ref11[0],
-      l = _ref11[1];
+  }, [["all", "All"], ["email", "📧 Email"], ["board", "🔍 Board"]].map(function (_ref9) {
+    var _ref0 = _slicedToArray(_ref9, 2),
+      v = _ref0[0],
+      l = _ref0[1];
     return /*#__PURE__*/React.createElement("span", {
       key: v,
       className: "pill",
@@ -2442,37 +1642,13 @@ function JobsTab(_ref9) {
         borderColor: sourceFilter === v ? "#3b82f644" : "#1e293b"
       }
     }, l);
-  })))), /*#__PURE__*/React.createElement("div", {
+  }))), /*#__PURE__*/React.createElement("div", {
     style: {
-      display: "flex",
-      alignItems: "center",
-      gap: 12
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      flex: 1
+      marginLeft: "auto"
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "sl"
-  }, "Min Match: ", /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: "#60a5fa"
-    }
-  }, minScore, "%")), /*#__PURE__*/React.createElement("input", {
-    type: "range",
-    min: 0,
-    max: 90,
-    step: 5,
-    value: minScore,
-    onChange: function onChange(e) {
-      return setMinScore(Number(e.target.value));
-    },
-    className: "slider",
-    style: {
-      "--val": "".concat(minScore, "%"),
-      width: "100%"
-    }
-  })), /*#__PURE__*/React.createElement("button", {
+  }, "\xA0"), /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: onRefresh,
     style: {
@@ -2481,10 +1657,9 @@ function JobsTab(_ref9) {
       padding: "9px 14px",
       borderRadius: 8,
       fontSize: 12,
-      border: "1px solid #2563eb44",
-      flexShrink: 0
+      border: "1px solid #2563eb44"
     }
-  }, loading ? "⟳ …" : "⟳ Refresh")))), /*#__PURE__*/React.createElement("div", {
+  }, loading ? "⟳ …" : "⟳ Refresh"))))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 10,
@@ -2500,19 +1675,10 @@ function JobsTab(_ref9) {
     }
   }, jobs.length), " shown"), "\xB7", /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("span", {
     style: {
-      color: "#22c55e",
-      fontWeight: 700
-    }
-  }, allJobs.filter(function (j) {
-    return (j.score || 0) >= 75;
-  }).length), " strong matches"), "\xB7", /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("span", {
-    style: {
       color: "#34d399",
       fontWeight: 700
     }
-  }, allJobs.filter(function (j) {
-    return j.source === "email";
-  }).length), " from email"), "\xB7", /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("span", {
+  }, emailCount), " from email"), "\xB7", /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("span", {
     style: {
       color: "#4ade80",
       fontWeight: 700
@@ -2542,8 +1708,7 @@ function JobsTab(_ref9) {
     }
   }, "\u27F3"), /*#__PURE__*/React.createElement("div", {
     style: {
-      marginTop: 10,
-      fontSize: 13
+      marginTop: 10
     }
   }, "Fetching\u2026")) : jobs.length === 0 ? /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2626,10 +1791,7 @@ function JobsTab(_ref9) {
       gap: 6,
       marginBottom: 14
     }
-  }, /*#__PURE__*/React.createElement(ScoreBadge, {
-    score: selectedJob.score,
-    loading: selectedJob.scoreLoading
-  }), /*#__PURE__*/React.createElement("span", {
+  }, /*#__PURE__*/React.createElement("span", {
     className: "tag",
     style: {
       background: "#1e293b",
@@ -2657,23 +1819,7 @@ function JobsTab(_ref9) {
     }
   }, "\uD83D\uDCB0 ", selectedJob.salary), applied.has(selectedJob.id) && /*#__PURE__*/React.createElement("span", {
     className: "applied-badge"
-  }, "\u2713 APPLIED")), ((_selectedJob$reasons = selectedJob.reasons) === null || _selectedJob$reasons === void 0 ? void 0 : _selectedJob$reasons.length) > 0 && /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginBottom: 14
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "sl"
-  }, "Match Insights"), selectedJob.reasons.map(function (r, i) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: i,
-      style: {
-        fontSize: 12,
-        color: "#94a3b8",
-        padding: "4px 0",
-        borderBottom: "1px solid #0f172a"
-      }
-    }, "\u2022 ", r);
-  })), selectedJob.source === "mock" && /*#__PURE__*/React.createElement("div", {
+  }, "\u2713 APPLIED")), selectedJob.source === "mock" && /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "8px 12px",
       background: "#1a1a00",
@@ -2681,8 +1827,7 @@ function JobsTab(_ref9) {
       borderRadius: 8,
       fontSize: 11,
       color: "#fbbf24",
-      marginBottom: 12,
-      lineHeight: 1.5
+      marginBottom: 12
     }
   }, "\u26A0\uFE0F Sample listing \u2014 sync Gmail to get real jobs from your alert emails."), /*#__PURE__*/React.createElement("div", {
     className: "sl"
@@ -2697,48 +1842,29 @@ function JobsTab(_ref9) {
       padding: 12,
       marginBottom: 14
     }
-  }, selectedJob.description), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8
-    }
-  }, /*#__PURE__*/React.createElement("a", {
-    href: selectedJob.url,
-    target: "_blank",
-    rel: "noreferrer",
-    style: {
-      flex: 1,
-      textAlign: "center",
-      padding: "9px",
-      background: "#1e293b",
-      color: "#94a3b8",
-      borderRadius: 8,
-      fontSize: 12,
-      textDecoration: "none"
-    }
-  }, selectedJob.source === "mock" ? "🔍 Search" : "🔗 View Job"), /*#__PURE__*/React.createElement("button", {
+  }, selectedJob.description), /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: function onClick() {
       return _onApply(selectedJob);
     },
     style: {
-      flex: 2,
-      padding: "9px",
+      width: "100%",
+      padding: "11px",
       background: "linear-gradient(135deg,#2563eb,#7c3aed)",
       color: "white",
       borderRadius: 8,
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: 600
     }
-  }, applied.has(selectedJob.id) ? "✓ Apply Again" : "✨ Generate & Apply")))));
+  }, applied.has(selectedJob.id) ? "✓ Applied — Open Again" : selectedJob.source === "mock" ? "🔍 Search on Platform" : "🔗 Open Job"))));
 }
-function JobCard(_ref12) {
-  var job = _ref12.job,
-    selected = _ref12.selected,
-    wasApplied = _ref12.wasApplied,
-    onClick = _ref12.onClick,
-    onApply = _ref12.onApply,
-    compact = _ref12.compact;
+function JobCard(_ref1) {
+  var job = _ref1.job,
+    selected = _ref1.selected,
+    wasApplied = _ref1.wasApplied,
+    onClick = _ref1.onClick,
+    onApply = _ref1.onApply,
+    compact = _ref1.compact;
   var plat = PLATFORMS.find(function (p) {
     return p.id === job.platform;
   }) || {
@@ -2779,19 +1905,9 @@ function JobCard(_ref12) {
       fontSize: 12,
       color: "#64748b"
     }
-  }, job.company)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "flex-end",
-      gap: 4
-    }
-  }, /*#__PURE__*/React.createElement(ScoreBadge, {
-    score: job.score,
-    loading: job.scoreLoading
-  }), wasApplied && /*#__PURE__*/React.createElement("span", {
+  }, job.company)), wasApplied && /*#__PURE__*/React.createElement("span", {
     className: "applied-badge"
-  }, "\u2713 APPLIED"))), /*#__PURE__*/React.createElement("div", {
+  }, "\u2713")), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       flexWrap: "wrap",
@@ -2823,7 +1939,14 @@ function JobCard(_ref12) {
     }
   }, job.country), /*#__PURE__*/React.createElement(SourceBadge, {
     source: job.source
-  }), !compact && /*#__PURE__*/React.createElement("span", {
+  }), job.salary && /*#__PURE__*/React.createElement("span", {
+    className: "tag",
+    style: {
+      background: "#1e2a1e",
+      color: "#4ade80",
+      fontSize: 10
+    }
+  }, "\uD83D\uDCB0 ", job.salary), !compact && /*#__PURE__*/React.createElement("span", {
     style: {
       flex: 1
     }
@@ -2841,7 +1964,7 @@ function JobCard(_ref12) {
       fontSize: 11,
       fontWeight: 600
     }
-  }, job.source === "mock" ? "Find" : "Apply ✨")), !compact && job.postedAt && /*#__PURE__*/React.createElement("div", {
+  }, job.source === "mock" ? "Search" : "Open")), !compact && job.postedAt && /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
       color: "#334155",
@@ -2851,17 +1974,17 @@ function JobCard(_ref12) {
 }
 
 // ─── Profile Tab ──────────────────────────────────────────────────────────────
-function ProfileTab(_ref13) {
-  var profile = _ref13.profile,
-    onSave = _ref13.onSave;
-  var _useState33 = useState(profile),
-    _useState34 = _slicedToArray(_useState33, 2),
-    p = _useState34[0],
-    setP = _useState34[1];
-  var _useState35 = useState("basic"),
-    _useState36 = _slicedToArray(_useState35, 2),
-    section = _useState36[0],
-    setSection = _useState36[1];
+function ProfileTab(_ref10) {
+  var profile = _ref10.profile,
+    onSave = _ref10.onSave;
+  var _useState27 = useState(profile),
+    _useState28 = _slicedToArray(_useState27, 2),
+    p = _useState28[0],
+    setP = _useState28[1];
+  var _useState29 = useState("basic"),
+    _useState30 = _slicedToArray(_useState29, 2),
+    section = _useState30[0],
+    setSection = _useState30[1];
   var set = function set(f, v) {
     return setP(function (prev) {
       return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, f, v));
@@ -2945,10 +2068,10 @@ function ProfileTab(_ref13) {
       overflowX: "auto",
       paddingBottom: 4
     }
-  }, [["basic", "🧑 Basic"], ["links", "🔗 Links"], ["experience", "💼 Experience"], ["education", "🎓 Education"], ["templates", "📄 Templates"]].map(function (_ref14) {
-    var _ref15 = _slicedToArray(_ref14, 2),
-      id = _ref15[0],
-      label = _ref15[1];
+  }, [["basic", "🧑 Basic"], ["links", "🔗 Links"], ["experience", "💼 Experience"], ["education", "🎓 Education"], ["templates", "📄 Templates"]].map(function (_ref11) {
+    var _ref12 = _slicedToArray(_ref11, 2),
+      id = _ref12[0],
+      label = _ref12[1];
     return /*#__PURE__*/React.createElement("button", {
       key: id,
       className: "btn",
@@ -3015,7 +2138,7 @@ function ProfileTab(_ref13) {
     onChange: function onChange(e) {
       return set("summary", e.target.value);
     },
-    placeholder: "8 years building scalable backend systems\u2026",
+    placeholder: "8 years building scalable systems\u2026",
     rows: 4
   }), /*#__PURE__*/React.createElement(F, {
     label: "Skills (comma-separated)",
@@ -3023,18 +2146,11 @@ function ProfileTab(_ref13) {
     onChange: function onChange(e) {
       return set("skills", e.target.value);
     },
-    placeholder: "Node.js, React, PostgreSQL, AWS, Docker, Kubernetes\u2026",
+    placeholder: "Node.js, React, PostgreSQL, AWS, Docker\u2026",
     rows: 3
   })), section === "links" && /*#__PURE__*/React.createElement(Sec, {
     title: "Links, CTC & Notice Period"
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      color: "#475569",
-      marginBottom: 12,
-      lineHeight: 1.6
-    }
-  }, "Used to auto-fill job forms. Blank fields will be asked per-application."), /*#__PURE__*/React.createElement(F, {
+  }, /*#__PURE__*/React.createElement(F, {
     label: "LinkedIn URL",
     value: p.linkedin,
     onChange: function onChange(e) {
@@ -3049,7 +2165,7 @@ function ProfileTab(_ref13) {
     },
     placeholder: "https://github.com/yourname"
   }), /*#__PURE__*/React.createElement(F, {
-    label: "Portfolio / Website",
+    label: "Portfolio",
     value: p.portfolio,
     onChange: function onChange(e) {
       return set("portfolio", e.target.value);
@@ -3258,7 +2374,7 @@ function ProfileTab(_ref13) {
     },
     style: {
       width: "100%",
-      minHeight: 220,
+      minHeight: 200,
       fontFamily: "'DM Mono',monospace",
       fontSize: 12,
       lineHeight: 1.7,
@@ -3279,40 +2395,14 @@ function ProfileTab(_ref13) {
     }
   }, "\u21A9 Reset")), /*#__PURE__*/React.createElement(Sec, {
     title: "\u2709\uFE0F Cover Letter Template"
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "9px 12px",
-      background: "#0a1e10",
-      border: "1px solid #166534",
-      borderRadius: 8,
-      fontSize: 11,
-      color: "#4ade80",
-      marginBottom: 10,
-      lineHeight: 1.6
-    }
-  }, "\u2705 Auto-generated for ", /*#__PURE__*/React.createElement("strong", null, "LinkedIn, Indeed, Naukri")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      color: "#475569",
-      marginBottom: 10,
-      lineHeight: 1.6
-    }
-  }, "Placeholders: ", ["{name}", "{email}", "{phone}", "{date}", "{title}", "{company}", "{years_experience}", "{top_skills}", "{why_company_paragraph}", "{key_achievements_paragraph}"].map(function (ph) {
-    return /*#__PURE__*/React.createElement("code", {
-      key: ph,
-      style: {
-        color: "#a78bfa",
-        marginRight: 4
-      }
-    }, ph);
-  })), /*#__PURE__*/React.createElement("textarea", {
+  }, /*#__PURE__*/React.createElement("textarea", {
     value: p.coverLetterTemplate,
     onChange: function onChange(e) {
       return set("coverLetterTemplate", e.target.value);
     },
     style: {
       width: "100%",
-      minHeight: 260,
+      minHeight: 200,
       fontFamily: "'DM Mono',monospace",
       fontSize: 12,
       lineHeight: 1.7,
@@ -3351,27 +2441,27 @@ function ProfileTab(_ref13) {
 }
 
 // Mount
-var _root = ReactDOM.createRoot(document.getElementById('root'));
+var _root = ReactDOM.createRoot(document.getElementById("root"));
 _root.render(React.createElement(App));
 (function hideSplash() {
   var check = setInterval(function () {
-    var root = document.getElementById('root');
-    var s = document.getElementById('splash');
+    var root = document.getElementById("root");
+    var s = document.getElementById("splash");
     if (!s) {
       clearInterval(check);
       return;
     }
     if (root && root.children.length > 0) {
       clearInterval(check);
-      s.classList.add('hide');
+      s.classList.add("hide");
       setTimeout(function () {
-        s && s.remove();
+        return s && s.remove();
       }, 600);
     }
   }, 150);
   setTimeout(function () {
     clearInterval(check);
-    var s = document.getElementById('splash');
+    var s = document.getElementById("splash");
     s && s.remove();
   }, 8000);
 })();
